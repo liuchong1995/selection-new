@@ -1,7 +1,7 @@
 package com.jidong.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jidong.response.RespBean;
+import com.jidong.response.LoginResponse;
 import com.jidong.service.impl.UserServiceImpl;
 import com.jidong.util.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.web.cors.CorsUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,45 +36,53 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	AuthenticationAccessDeniedHandler deniedHandler;
 
+	@Autowired
+	CorsControllerFilter corsControllerFilter;
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userService)
 				.passwordEncoder(new BCryptPasswordEncoder());
 	}
+
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/index.html", "/static/**", "/login_p");
+		web.ignoring().antMatchers("/index.html", "/static/**");
 	}
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
+		http
+				.addFilterBefore(corsControllerFilter, SecurityContextPersistenceFilter.class)
+				.authorizeRequests()
+				.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()//就是这一行啦
 				.and()
-				.formLogin().loginPage("/login_p").loginProcessingUrl("/login")
+				.formLogin().loginProcessingUrl("/login")
 				.usernameParameter("username").passwordParameter("password")
 				.failureHandler((req, resp, e) -> {
 					resp.setContentType("application/json;charset=utf-8");
-					RespBean respBean = null;
+					LoginResponse loginResponse = null;
 					if (e instanceof BadCredentialsException ||
 							e instanceof UsernameNotFoundException) {
-						respBean = RespBean.error("账户名或者密码输入错误!");
+						loginResponse = LoginResponse.error("账户名或者密码输入错误!");
 					} else if (e instanceof LockedException) {
-						respBean = RespBean.error("账户被锁定，请联系管理员!");
+						loginResponse = LoginResponse.error("账户被锁定，请联系管理员!");
 					} else if (e instanceof CredentialsExpiredException) {
-						respBean = RespBean.error("密码过期，请联系管理员!");
+						loginResponse = LoginResponse.error("密码过期，请联系管理员!");
 					} else if (e instanceof AccountExpiredException) {
-						respBean = RespBean.error("账户过期，请联系管理员!");
+						loginResponse = LoginResponse.error("账户过期，请联系管理员!");
 					} else if (e instanceof DisabledException) {
-						respBean = RespBean.error("账户被禁用，请联系管理员!");
+						loginResponse = LoginResponse.error("账户被禁用，请联系管理员!");
 					} else {
-						respBean = RespBean.error("登录失败!");
+						loginResponse = LoginResponse.error("登录失败!");
 					}
 					resp.setStatus(401);
-					writeResult(resp,respBean);
+					writeResult(resp, loginResponse);
 				})
 				.successHandler((req, resp, auth) -> {
 					resp.setContentType("application/json;charset=utf-8");
-					RespBean respBean = RespBean.ok("登录成功!", UserUtils.getCurrentUser());
-					writeResult(resp,respBean);
+					LoginResponse loginResponse = LoginResponse.ok("登录成功!", UserUtils.getCurrentUser());
+					writeResult(resp, loginResponse);
 				})
 				.permitAll()
 				.and()
@@ -81,10 +91,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.exceptionHandling().accessDeniedHandler(deniedHandler);
 	}
 
-	private void writeResult(HttpServletResponse resp, RespBean respBean) throws IOException {
+	private void writeResult(HttpServletResponse resp, LoginResponse loginResponse) throws IOException {
 		ObjectMapper om = new ObjectMapper();
 		PrintWriter out = resp.getWriter();
-		out.write(om.writeValueAsString(respBean));
+		out.write(om.writeValueAsString(loginResponse));
 		out.flush();
 		out.close();
 	}
