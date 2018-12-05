@@ -3,6 +3,9 @@ package com.jidong.productselection.entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
 * Created by Mybatis Generator 2018/11/22
 */
@@ -28,4 +31,6 @@ public class JdCategory {
     private String categoryProperties;
 
     private Boolean isShow;
+
+    private List<JdCategory> children = new ArrayList<>();
 }
