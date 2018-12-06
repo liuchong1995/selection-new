@@ -61,7 +61,7 @@ public class JdComponentServiceImpl implements JdComponentService {
 			allComponentIds.addAll(JSON.parseArray(category.getComponentsId(),Integer.class));
 		}
 		if (allComponentIds.size() == 0){
-			return null;
+			return new ArrayList<>();
 		}
 		List<JdComponent> componentList = componentMapper.findByComponentIdIn(allComponentIds);
 		List<JdComponent> finalOptionList = componentList.stream().filter(comp -> !comp.getComponentType().equals(ComponentTypeEnum.ATTACHMENT.getCode())).collect(Collectors.toList());

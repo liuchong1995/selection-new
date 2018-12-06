@@ -177,4 +177,9 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		}
 		return allLeafCategory;
 	}
+
+	@Override
+	public List<JdCategory> getNewMenuTree(Integer prdId, Integer parentId) {
+		return categoryMapper.getNewMenuTree(prdId,parentId);
+	}
 }

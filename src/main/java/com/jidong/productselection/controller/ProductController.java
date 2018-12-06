@@ -31,7 +31,7 @@ public class ProductController {
 			return BaseResponse.success(productList);
 		} catch (Exception e) {
 			log.error("获取产品列表错误！" + e.getMessage(), e);
-			return BaseResponse.error();
+			return BaseResponse.error("获取产品列表错误！");
 		}
 	}
 }

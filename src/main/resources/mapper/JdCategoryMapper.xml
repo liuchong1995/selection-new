@@ -29,7 +29,7 @@
 		<result column="category_properties" jdbcType="VARCHAR" property="categoryProperties"/>
 		<result column="is_show" jdbcType="BIT" property="isShow"/>
 		<collection property="children" ofType="com.jidong.productselection.entity.JdCategory"
-		            select="com.jidong.productselection.dao.JdCategoryMapper.getNewMenuTree" column="category_id">
+		            select="com.jidong.productselection.dao.JdCategoryMapper.selectCateChildren" column="category_id">
 		</collection>
 	</resultMap>
 	<sql id="Base_Column_List">
@@ -43,6 +43,9 @@
 	<select id="getNewMenuTree" resultMap="TreeResultMap">
 		select d1.*from jd_category d1 where d1.product_id=#{prdId} AND d1.parent_id=#{parentId} AND d1.is_show=1;
 	</select>
+    <select id="selectCateChildren" resultMap="TreeResultMap">
+        select d1.*from jd_category d1 where d1.parent_id=#{parentId} AND d1.is_show=1;
+    </select>
 	<select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
 		<!--
 		  WARNING - @mbg.generated

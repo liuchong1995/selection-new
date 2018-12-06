@@ -41,4 +41,6 @@ public interface JdCategoryMapper {
 	List<JdCategory> findByParentId(@Param("parentId") Integer parentId);
 
     List<JdCategory> getNewMenuTree(@Param("prdId") Integer prdId,@Param("parentId") Integer parentId);
+
+    List<JdCategory> selectCateChildren(@Param("parentId") Integer parentId);
 }

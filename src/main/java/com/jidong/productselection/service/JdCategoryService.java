@@ -30,4 +30,6 @@ public interface JdCategoryService {
 	int delete(JdCategory category);
 
 	List<JdCategory> getAllLeafCategory(Integer categoryIds);
+
+	List<JdCategory> getNewMenuTree(Integer prdId,Integer parentId);
 }
