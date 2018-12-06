@@ -13,6 +13,7 @@ public class SelectionNewApplication {
 		SpringApplication.run(SelectionNewApplication.class, args);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Bean
 	public FilterRegistrationBean filterRegistrationBean() {
 		FilterRegistrationBean registrationBean = new FilterRegistrationBean();

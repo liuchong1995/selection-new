@@ -19,6 +19,8 @@ public interface JdConstraintService {
 
 	String refactorMenuTree(Integer productId, List<JdComponent> selectedList);
 
+	List<JdCategory> refactorNewMenuTree(Integer productId, List<JdComponent> selectedList);
+
 	List<JdComponent> getOptionalListBySelected(Integer productId, List<JdComponent> selectedList);
 
 	List<JdComponent> findOrderComponents(List<Integer> componentIds);

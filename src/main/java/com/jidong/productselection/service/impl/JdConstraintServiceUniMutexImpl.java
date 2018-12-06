@@ -640,4 +640,55 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		return categories;
 	}
 
+	@Override
+	public List<JdCategory> refactorNewMenuTree(Integer productId, List<JdComponent> selectedList){
+		List<JdCategory> banCateGoryList = new ArrayList<>(getBanCategoryList(productId, selectedList));
+		List<JdCategory> categoryList = categoryMapper.getNewMenuTree(productId,TOP_LEVEL);
+		List<Integer> banCategoryIds = banCateGoryList.stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
+		List<JdCategory> tempTopCategoryList = new ArrayList<>(categoryList);
+		//顶层过滤
+		for (JdCategory topCategory : categoryList) {
+			if (banCategoryIds.contains(topCategory.getCategoryId())){
+				tempTopCategoryList.remove(topCategory);
+			}
+		}
+		categoryList = new ArrayList<>(tempTopCategoryList);
+		//第二层过滤
+		for (JdCategory topCategory : categoryList) {
+			List<JdCategory> tempSecondCategoryList = new ArrayList<>(topCategory.getChildren());
+			for (JdCategory secondCategory : topCategory.getChildren()) {
+				if (banCategoryIds.contains(secondCategory.getCategoryId())){
+					tempSecondCategoryList.remove(secondCategory);
+				}
+			}
+			topCategory.setChildren(tempSecondCategoryList);
+		}
+		//第三层过滤
+		for (JdCategory topCategory : categoryList) {
+			for (JdCategory secondCategory : topCategory.getChildren()) {
+				List<JdCategory> tempThirdCategoryList = new ArrayList<>(secondCategory.getChildren());
+				for (JdCategory thirdCategory : secondCategory.getChildren()) {
+					if (banCategoryIds.contains(thirdCategory.getCategoryId())){
+						tempThirdCategoryList.remove(thirdCategory);
+					}
+				}
+				secondCategory.setChildren(tempThirdCategoryList);
+			}
+		}
+		//第四层过滤
+		for (JdCategory topCategory : categoryList) {
+			for (JdCategory secondCategory : topCategory.getChildren()) {
+				for (JdCategory thirdCategory : secondCategory.getChildren()) {
+					List<JdCategory> tempForthCategoryList = new ArrayList<>(thirdCategory.getChildren());
+					for (JdCategory forthCategory : thirdCategory.getChildren()) {
+						if (banCategoryIds.contains(forthCategory.getCategoryId())){
+							tempForthCategoryList.remove(forthCategory);
+						}
+					}
+					thirdCategory.setChildren(tempForthCategoryList);
+				}
+			}
+		}
+		return categoryList;
+	}
 }

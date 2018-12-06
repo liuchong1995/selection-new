@@ -1,8 +1,10 @@
 package com.jidong.productselection.controller;
 
 import com.jidong.productselection.entity.JdComponent;
+import com.jidong.productselection.request.GetAttachmentRequest;
 import com.jidong.productselection.request.OptionalListBySelectedRequest;
 import com.jidong.productselection.response.BaseResponse;
+import com.jidong.productselection.service.JdAttachmentService;
 import com.jidong.productselection.service.JdComponentService;
 import com.jidong.productselection.service.JdConstraintService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,9 @@ public class ComponentController {
 	@Autowired
 	private JdConstraintService constraintService;
 
+	@Autowired
+	private JdAttachmentService attachmentService;
+
 	@GetMapping("/getOptionalListByCateId/{categoryId}")
 	public BaseResponse<List<JdComponent>> findByCategoryId(@PathVariable("categoryId") Integer categoryId) {
 		try {
@@ -54,6 +59,27 @@ public class ComponentController {
 		} catch (Exception e) {
 			log.error("获取可选部件列表错误！" + e.getMessage(), e);
 			return BaseResponse.error();
+		}
+	}
+
+	@GetMapping("/{componentId}")
+	public BaseResponse<JdComponent> findOne(@PathVariable("componentId") Integer componentId) {
+		try {
+			JdComponent component = componentService.findById(componentId);
+			return BaseResponse.success(component);
+		} catch (Exception e) {
+			log.error("获取部件错误！" + e.getMessage(), e);
+			return BaseResponse.error("获取部件错误！");
+		}
+	}
+
+	@PostMapping("/hasAttachment")
+	public BaseResponse<List<JdComponent>> hasAttachment(@RequestBody GetAttachmentRequest getAttachmentRequest){
+		try {
+			return BaseResponse.success(attachmentService.hasAttachment(getAttachmentRequest));
+		} catch (Exception e){
+			log.error("获取附件错误！", e);
+			return BaseResponse.error("获取附件错误！");
 		}
 	}
 }
