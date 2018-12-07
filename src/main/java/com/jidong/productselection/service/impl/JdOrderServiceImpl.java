@@ -16,7 +16,6 @@ import com.jidong.productselection.service.JdConstraintService;
 import com.jidong.productselection.service.JdOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -163,7 +162,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 	@Transactional
 	public int insert(JdOrder order) {
 		parseComponentIds(order);
-		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		String userName = order.getCreator();
 		order.setCreator(userName);
 		order.setModifier(userName);
 		Integer nextOrderId = orderMapper.findNextOrderId();
@@ -268,7 +267,6 @@ public class JdOrderServiceImpl implements JdOrderService {
 		parseComponentIds(order);
 		Date now = new Date();
 		order.setUpdateTime(now);
-		order.setModifier(SecurityContextHolder.getContext().getAuthentication().getName());
 		return orderMapper.updateByPrimaryKeySelective(order);
 	}
 
