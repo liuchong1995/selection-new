@@ -6,6 +6,8 @@ package com.jidong.productselection.config;
  * @Description:
  */
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -42,6 +44,15 @@ public class CorsControllerFilter extends OncePerRequestFilter {
 		chain.doFilter(request, response);
 
 	}
+
+    @SuppressWarnings("unchecked")
+    @Bean
+    public FilterRegistrationBean filterRegistrationBean() {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        CorsControllerFilter corsControllerFilter = new CorsControllerFilter();
+        registrationBean.setFilter(corsControllerFilter);
+        return registrationBean;
+    }
 
 }
 

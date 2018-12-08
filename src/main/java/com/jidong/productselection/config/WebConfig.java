@@ -23,7 +23,6 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler(PRODUCT_IMG_REQUEST).addResourceLocations(PRODUCT_IMG_LOCATION);
-		registry.addResourceHandler("/admin" + PRODUCT_IMG_REQUEST).addResourceLocations(PRODUCT_IMG_LOCATION);
 	}
 
 	@Override

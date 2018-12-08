@@ -43,8 +43,7 @@ mybatis:
 logging:
   level:
     com:
-      jidong:
-          dao: debug
+      debug
 pagehelper:
   helperDialect: sqlserver
   reasonable: true
