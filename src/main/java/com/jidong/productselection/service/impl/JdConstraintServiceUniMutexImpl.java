@@ -96,7 +96,7 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			allComponentIds.addAll(JSON.parseArray(category.getComponentsId(), Integer.class));
 		}
 		if (allComponentIds.size() == 0) {
-			return null;
+			return new ArrayList<>();
 		}
 		List<JdComponent> componentList = componentMapper.findByComponentIdIn(allComponentIds);
 		List<JdComponent> banComponentList = new ArrayList<>(getBanComponentList(categoryMapper.selectByPrimaryKey(categoryId).getProductId(), selectedList));
