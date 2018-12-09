@@ -116,7 +116,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 	}
 
 	@Override
-	public OrderDetail getOrderDetail(Integer orderId) {
+	public OrderDetail getOrderDetail(Integer orderId,Boolean changeShelfCode) {
 		OrderDetail orderDetail = new OrderDetail();
 		JdOrder order = findOne(orderId);
 		orderDetail.setOrder(order);
@@ -125,11 +125,13 @@ public class JdOrderServiceImpl implements JdOrderService {
 		List<OrderItem> orderItems = JSON.parseArray(order.getComponentIds(), OrderItem.class);
 		List<Integer> componentIds = orderItems.stream().map(OrderItem::getCompId).collect(Collectors.toList());
 		List<JdComponent> components = componentMapper.findByComponentIdIn(componentIds);
-		components.forEach(comp -> {
-			if (Objects.equals(comp.getFirstCategoryId(),product.getShelfId())){
-				comp.setComponentModelNumber(order.getShelfCode());
-			}
-		});
+		if (changeShelfCode){
+			components.forEach(comp -> {
+				if (Objects.equals(comp.getFirstCategoryId(),product.getShelfId())){
+					comp.setComponentModelNumber(order.getShelfCode());
+				}
+			});
+		}
 		orderDetail.setComponents(components);
 		return orderDetail;
 	}
@@ -161,6 +163,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 	@Override
 	@Transactional
 	public int insert(JdOrder order) {
+		order.setShelfCode("");
 		parseComponentIds(order);
 		String userName = order.getCreator();
 		order.setCreator(userName);

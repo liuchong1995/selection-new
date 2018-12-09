@@ -29,5 +29,5 @@ public interface JdOrderService {
 
 	MandatoryResult getMandatoryResult(JdOrder order);
 
-	OrderDetail getOrderDetail(Integer orderId);
+	OrderDetail getOrderDetail(Integer orderId,Boolean changeShelfCode);
 }

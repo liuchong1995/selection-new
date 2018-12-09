@@ -92,7 +92,18 @@ public class OrderController {
 	@GetMapping("/orderDetail/{orderId}")
 	public BaseResponse<OrderDetail> getOrderDetail(@PathVariable("orderId") Integer orderId){
 		try {
-			OrderDetail order = orderService.getOrderDetail(orderId);
+			OrderDetail order = orderService.getOrderDetail(orderId,true);
+			return BaseResponse.success(order);
+		} catch (Exception e) {
+			log.error("获取订单错误！" + e.getMessage(), e);
+			return BaseResponse.error("获取订单错误！");
+		}
+	}
+
+	@GetMapping("/{orderId}")
+	public BaseResponse<OrderDetail> findOne(@PathVariable("orderId") Integer orderId){
+		try {
+			OrderDetail order = orderService.getOrderDetail(orderId,false);
 			return BaseResponse.success(order);
 		} catch (Exception e) {
 			log.error("获取订单错误！" + e.getMessage(), e);
