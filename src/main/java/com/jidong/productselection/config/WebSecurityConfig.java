@@ -74,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					} else if (e instanceof DisabledException) {
 						loginResponse = LoginResponse.error("账户被禁用，请联系管理员!");
 					} else {
-						loginResponse = LoginResponse.error("登录失败!");
+						loginResponse = LoginResponse.error("账户被禁用，请联系管理员!");
 					}
 					resp.setStatus(401);
 					writeResult(resp, loginResponse);

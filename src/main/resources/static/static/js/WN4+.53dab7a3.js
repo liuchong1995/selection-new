@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([["WN4+"],{"WN4+":function(e,t,n){"use strict";n.r(t);var s={name:"fork",components:{SelectDetail:n("CAGU").a}},i=n("KHd+"),l=Object(i.a)(s,function(){var e=this.$createElement;return(this._self._c||e)("select-detail",{attrs:{"is-edit":!0,"is-fork":!0}})},[],!1,null,null,null);l.options.__file="fork.vue";t.default=l.exports}}]);

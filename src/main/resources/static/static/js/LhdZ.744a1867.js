@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([["LhdZ"],{LhdZ:function(e,t,n){"use strict";n.r(t);var i={name:"editOrder",components:{SelectDetail:n("CAGU").a}},l=n("KHd+"),s=Object(l.a)(i,function(){var e=this.$createElement;return(this._self._c||e)("select-detail",{attrs:{"is-edit":!0}})},[],!1,null,null,null);s.options.__file="edit.vue";t.default=s.exports}}]);

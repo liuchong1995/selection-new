@@ -45,8 +45,7 @@ logging:
     com:
       jidong:
         productselection:
-          dao:
-            debug
+          dao: debug
 pagehelper:
   helperDialect: sqlserver
   reasonable: true
