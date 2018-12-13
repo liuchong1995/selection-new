@@ -2,6 +2,7 @@ package com.jidong.productselection.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.jidong.productselection.entity.JdComponent;
+import com.jidong.productselection.request.ComponentAddRequest;
 import com.jidong.productselection.request.ComponentSearchRequest;
 import com.jidong.productselection.request.GetAttachmentRequest;
 import com.jidong.productselection.request.OptionalListBySelectedRequest;
@@ -138,6 +139,29 @@ public class ComponentController {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("error", "图片不合法");
 			return map;
+		}
+	}
+
+	@PostMapping("/isExit")
+	public BaseResponse<List<JdComponent>> isExit(@RequestBody ComponentAddRequest request) {
+		try {
+			List<JdComponent> componentList = componentService.isExit(request);
+			return BaseResponse.success(componentList);
+		} catch (Exception e) {
+			log.error("获取同名部件！", e);
+			return BaseResponse.error();
+		}
+	}
+
+	@PostMapping("/insert")
+	public BaseResponse insertComponent(
+			@RequestBody ComponentAddRequest componentAddRequest
+	) {
+		try {
+			return BaseResponse.success(componentService.insertComponent(componentAddRequest));
+		} catch (Exception e) {
+			log.error("新增部件错误！" + e.getMessage(), e);
+			return BaseResponse.error("新增部件错误！");
 		}
 	}
 }

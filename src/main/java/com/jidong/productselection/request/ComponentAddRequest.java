@@ -33,4 +33,6 @@ public class ComponentAddRequest {
 	private Integer componentType;
 
 	private String componentKey;
+
+	private String creator;
 }

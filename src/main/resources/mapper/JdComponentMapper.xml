@@ -341,8 +341,19 @@
         select
         <include refid="Base_Column_List"/>
         from jd_component
-        where product_id=#{productId,jdbcType=INTEGER} and
-        component_model_number=#{componentModelNumber,jdbcType=VARCHAR} or
-        component_short_number=#{componentShortNumber,jdbcType=VARCHAR}
+        <where>
+          <if test="productId != null">
+            product_id=#{productId,jdbcType=INTEGER}
+          </if>
+          <if test="componentModelNumber != null">
+            and component_model_number=#{componentModelNumber,jdbcType=VARCHAR}
+          </if>
+          <if test="componentModelNumber != null and componentShortNumber != null">
+            or component_short_number=#{componentShortNumber,jdbcType=VARCHAR}
+          </if>
+          <if test="componentModelNumber == null and componentShortNumber != null">
+            and component_short_number=#{componentShortNumber,jdbcType=VARCHAR}
+          </if>
+        </where>
     </select>
 </mapper>

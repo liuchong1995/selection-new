@@ -139,8 +139,7 @@ public class JdComponentServiceImpl implements JdComponentService {
 		Date now = new Date();
 		component.setCreateTime(now);
 		component.setUpdateTime(now);
-		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-		component.setCreator(userName);
+		component.setCreator(componentAddRequest.getCreator());
 		component.setIsDeleted(false);
 		return componentMapper.insertSelective(component);
 	}
