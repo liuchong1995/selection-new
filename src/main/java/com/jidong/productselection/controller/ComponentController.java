@@ -1,6 +1,8 @@
 package com.jidong.productselection.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.jidong.productselection.entity.JdComponent;
+import com.jidong.productselection.request.ComponentSearchRequest;
 import com.jidong.productselection.request.GetAttachmentRequest;
 import com.jidong.productselection.request.OptionalListBySelectedRequest;
 import com.jidong.productselection.response.BaseResponse;
@@ -80,6 +82,29 @@ public class ComponentController {
 		} catch (Exception e){
 			log.error("获取附件错误！", e);
 			return BaseResponse.error("获取附件错误！");
+		}
+	}
+
+	@PostMapping("/search")
+	public BaseResponse<PageInfo<JdComponent>> search(
+			@RequestBody ComponentSearchRequest searchRequest
+	) {
+		try {
+			PageInfo<JdComponent> componentPageInfo = componentService.search(searchRequest);
+			return BaseResponse.success(componentPageInfo);
+		} catch (Exception e) {
+			log.error("获取部件列表错误！" + e.getMessage(), e);
+			return BaseResponse.error("获取部件列表错误！");
+		}
+	}
+
+	@DeleteMapping("/deleteOrRecovery/{componentId}")
+	public BaseResponse deleteOrRecovery(@PathVariable("componentId") Integer componentId){
+		try {
+			return BaseResponse.success(componentService.deleteComponent(componentId));
+		} catch (Exception e) {
+			log.error("删除或恢复部件失败！" + e.getMessage(), e);
+			return BaseResponse.error("删除或恢复部件失败！");
 		}
 	}
 }

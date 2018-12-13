@@ -2,7 +2,9 @@ package com.jidong.productselection.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.jidong.productselection.dao.JdCategoryMapper;
+import com.jidong.productselection.dao.JdProductMapper;
 import com.jidong.productselection.entity.JdCategory;
+import com.jidong.productselection.entity.JdProduct;
 import com.jidong.productselection.request.CategoryAddRequest;
 import com.jidong.productselection.service.JdCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Author: LiuChong
@@ -28,6 +31,9 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 
 	@Autowired
 	private JdCategoryMapper categoryMapper;
+
+	@Autowired
+	private JdProductMapper productMapper;
 
 	@Override
 	public String getMenuTree(Integer prdId) {
@@ -118,9 +124,10 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 	public int add(CategoryAddRequest categoryAddRequest) {
 		JdCategory category = new JdCategory();
 		List<JdCategory> preCategories = categoryAddRequest.getPreCategories();
+		Integer productId = categoryAddRequest.getProduct().getProductId();
 		category.setCategoryId(categoryMapper.findNextCategoryId())
 				.setCategoryName(categoryAddRequest.getNewCategoryName())
-				.setProductId(categoryAddRequest.getProduct().getProductId())
+				.setProductId(productId)
 				.setIsLeaf(false)
 				.setIsShow(categoryAddRequest.getIsShow());
 		if (!preCategories.isEmpty()) {
@@ -133,6 +140,24 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		} else {
 			category.setParentId(TOP_LEVEL)
 					.setCategoryLevel(TOP_LEVEL);
+			if (categoryAddRequest.getCategoryOrder() != null){
+				List<Integer> orders = categoryMapper.findByProductIdAndParentId(productId, TOP_LEVEL).stream().map(JdCategory::getCategoryOrder).collect(Collectors.toList());
+				if (!orders.contains(categoryAddRequest.getCategoryOrder())){
+					category.setCategoryOrder(categoryAddRequest.getCategoryOrder());
+				} else {
+					throw new RuntimeException("已存在序号");
+				}
+			}
+			Integer categoryId = category.getCategoryId();
+			JdProduct product = productMapper.selectByPrimaryKey(productId);
+			if (categoryAddRequest.getIsMainCate()){
+				product.setMainCateid(categoryId);
+			} else if(categoryAddRequest.getIsInstallation()){
+				product.setInstallationId(categoryId);
+			} else if (categoryAddRequest.getIsShelf()){
+				product.setShelfId(categoryId);
+			}
+			productMapper.updateByPrimaryKeySelective(product);
 		}
 		return categoryMapper.insert(category);
 	}
@@ -181,5 +206,10 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 	@Override
 	public List<JdCategory> getNewMenuTree(Integer prdId, Integer parentId) {
 		return categoryMapper.getNewMenuTree(prdId,parentId);
+	}
+
+	@Override
+	public List<JdCategory> getAllNewMenuTree(Integer prdId, Integer parentId) {
+		return categoryMapper.getAllNewMenuTree(prdId,parentId);
 	}
 }

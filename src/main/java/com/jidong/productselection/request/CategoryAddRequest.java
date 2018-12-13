@@ -21,4 +21,12 @@ public class CategoryAddRequest {
 	private String newCategoryName;
 
 	private Boolean isShow;
+
+	private Boolean isMainCate;
+
+	private Boolean isInstallation;
+
+	private Boolean isShelf;
+
+	private Integer categoryOrder;
 }

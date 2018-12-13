@@ -182,14 +182,26 @@ public class JdComponentServiceImpl implements JdComponentService {
 	public int deleteComponent(Integer componentId) {
 		JdComponent component = componentMapper.selectByPrimaryKey(componentId);
 		JdCategory category = categoryMapper.selectByPrimaryKey(component.getLastCategoryId());
-		List<Integer> list = JSON.parseArray(category.getComponentsId(), Integer.class);
-		list.remove(componentId);
-		if (list.size() == 0){
-			category.setIsLeaf(Boolean.FALSE);
+		if (!component.getIsDeleted()){
+			List<Integer> list = JSON.parseArray(category.getComponentsId(), Integer.class);
+			list.remove(componentId);
+			if (list.size() == 0){
+				category.setIsLeaf(Boolean.FALSE);
+			}
+			category.setComponentsId(JSON.toJSONString(list));
+			categoryMapper.updateByPrimaryKeySelective(category);
+			return componentMapper.updateIsDeletedByComponentId(Boolean.TRUE,componentId);
+		} else {
+			if (category.getIsLeaf()) {
+				category.setComponentsId(JSON.toJSONString(Collections.singletonList(componentId)));
+				category.setIsLeaf(false);
+			} else {
+				List<Integer> compIds = JSON.parseArray(category.getComponentsId(), Integer.class);
+				compIds.add(componentId);
+				category.setComponentsId(JSON.toJSONString(compIds));
+			}
+			return componentMapper.updateIsDeletedByComponentId(Boolean.FALSE,componentId);
 		}
-		category.setComponentsId(JSON.toJSONString(list));
-		categoryMapper.updateByPrimaryKeySelective(category);
-		return componentMapper.updateIsDeletedByComponentId(Boolean.TRUE,componentId);
 	}
 
 	/**

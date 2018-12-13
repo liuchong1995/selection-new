@@ -18,6 +18,8 @@ public class ComponentSearchRequest {
 
 	private String componentModelNumber;
 
+	private Boolean isDelete;
+
 	private int page;
 
 	private int rows;

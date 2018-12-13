@@ -43,8 +43,17 @@
 	<select id="getNewMenuTree" resultMap="TreeResultMap">
 		select d1.*from jd_category d1 where d1.product_id=#{prdId} AND d1.parent_id=#{parentId} AND d1.is_show=1;
 	</select>
+
+	<select id="getAllNewMenuTree" resultMap="TreeResultMap">
+		select d1.*from jd_category d1 where d1.product_id=#{prdId} AND d1.parent_id=#{parentId};
+	</select>
+
     <select id="selectCateChildren" resultMap="TreeResultMap">
         select d1.*from jd_category d1 where d1.parent_id=#{parentId} AND d1.is_show=1;
+    </select>
+
+	<select id="selectAllCateChildren" resultMap="TreeResultMap">
+        select d1.*from jd_category d1 where d1.parent_id=#{parentId};
     </select>
 	<select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
 		<!--
