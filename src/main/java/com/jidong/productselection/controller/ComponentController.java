@@ -187,4 +187,15 @@ public class ComponentController {
 			return BaseResponse.error("修改部件错误！");
 		}
 	}
+
+	@GetMapping("/findComponents/{lastCategoryId}")
+	public BaseResponse<List<JdComponent>> findByLastCategoryId(@PathVariable("lastCategoryId") Integer lastCategoryId) {
+		try {
+			List<JdComponent> components = componentService.findByLastCategoryId(lastCategoryId);
+			return BaseResponse.success(components);
+		} catch (Exception e) {
+			log.error("获取部件列表错误！" + e.getMessage(), e);
+			return BaseResponse.error("获取部件列表错误！");
+		}
+	}
 }
