@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface JdProductService {
 	List<JdProduct> findAll();
+
+	JdProduct findOne(Integer prdId);
 }

@@ -32,4 +32,11 @@ public class JdProductServiceImpl implements JdProductService {
 		}
 		return productList;
 	}
+
+	@Override
+	public JdProduct findOne(Integer prdId) {
+		JdProduct product = productMapper.selectByPrimaryKey(prdId);
+		product.setProductImg(PRODUCT_IMG_REQUEST_PRE + product.getProductImg());
+		return product;
+	}
 }

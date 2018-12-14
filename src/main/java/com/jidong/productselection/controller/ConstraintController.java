@@ -58,7 +58,7 @@ public class ConstraintController {
 	}
 
 	@PostMapping("/shelfConstraint")
-	public BaseResponse deleteConstraints(@RequestBody JdShelfConstraint shelfConstraint){
+	public BaseResponse addShelfConstraints(@RequestBody JdShelfConstraint shelfConstraint){
 		try {
 			int n = constraintService.addShelfConstraint(shelfConstraint);
 			return BaseResponse.success(n);
