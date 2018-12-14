@@ -164,4 +164,27 @@ public class ComponentController {
 			return BaseResponse.error("新增部件错误！");
 		}
 	}
+
+	@GetMapping("/getComponentToShow/{componentId}")
+	public BaseResponse<ComponentAddRequest> getComponentToShow(@PathVariable("componentId") Integer componentId){
+		try {
+			return BaseResponse.success(componentService.getComponentToShow(componentId));
+		} catch (Exception e) {
+			log.error("获取部件信息失败！" + e.getMessage(), e);
+			return BaseResponse.error("获取部件信息失败！");
+		}
+	}
+
+	@PostMapping("/update/{componentId}")
+	public BaseResponse updateComponent(
+			@PathVariable("componentId") Integer componentId,
+			@RequestBody ComponentAddRequest componentAddRequest
+	) {
+		try {
+			return BaseResponse.success(componentService.updateComponent(componentId,componentAddRequest));
+		} catch (Exception e) {
+			log.error("修改部件错误！" + e.getMessage(), e);
+			return BaseResponse.error("修改部件错误！");
+		}
+	}
 }

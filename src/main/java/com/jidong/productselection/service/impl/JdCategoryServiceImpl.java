@@ -156,6 +156,8 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 				product.setInstallationId(categoryId);
 			} else if (categoryAddRequest.getIsShelf()){
 				product.setShelfId(categoryId);
+			} else if (categoryAddRequest.getIsVoltage()){
+				product.setVoltageId(categoryId);
 			}
 			productMapper.updateByPrimaryKeySelective(product);
 		}

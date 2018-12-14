@@ -28,5 +28,7 @@ public class CategoryAddRequest {
 
 	private Boolean isShelf;
 
+	private Boolean isVoltage;
+
 	private Integer categoryOrder;
 }

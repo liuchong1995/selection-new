@@ -2,6 +2,9 @@ package com.jidong.productselection.entity;
 
 import lombok.Data;
 
+/**
+* Created by Mybatis Generator 2018/12/14
+*/
 @Data
 public class JdProduct {
     private Integer productId;
@@ -17,4 +20,6 @@ public class JdProduct {
     private String segmentation;
 
     private Integer mainCateid;
+
+    private Integer voltageId;
 }
