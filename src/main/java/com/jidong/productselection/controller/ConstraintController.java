@@ -32,7 +32,7 @@ public class ConstraintController {
 			return BaseResponse.success(constraintService.insertConstraint(constraintRequest));
 		} catch (Exception e) {
 			log.error("增加约束错误！" + e.getMessage(), e);
-			return BaseResponse.error();
+			return BaseResponse.error("增加约束错误！");
 		}
 	}
 
@@ -42,7 +42,7 @@ public class ConstraintController {
 			return BaseResponse.success(constraintService.deleteConstraint(constraintId));
 		} catch (Exception e) {
 			log.error("删除约束错误！" + e.getMessage(), e);
-			return BaseResponse.error();
+			return BaseResponse.error("删除约束错误！");
 		}
 	}
 
@@ -53,7 +53,7 @@ public class ConstraintController {
 			return BaseResponse.success();
 		} catch (Exception e) {
 			log.error("批量删除约束错误！" + e.getMessage(), e);
-			return BaseResponse.error();
+			return BaseResponse.error("批量删除约束错误！");
 		}
 	}
 
@@ -64,7 +64,7 @@ public class ConstraintController {
 			return BaseResponse.success(n);
 		} catch (Exception e) {
 			log.error("增加架子约束错误！" + e.getMessage(), e);
-			return BaseResponse.error();
+			return BaseResponse.error("增加架子约束错误！");
 		}
 	}
 
@@ -74,7 +74,7 @@ public class ConstraintController {
 			return BaseResponse.success(constraintService.getMaxGroupId());
 		} catch (Exception e) {
 			log.error("获取最大组号错误！" + e.getMessage(), e);
-			return BaseResponse.error();
+			return BaseResponse.error("获取最大组号错误！");
 		}
 	}
 
@@ -86,7 +86,7 @@ public class ConstraintController {
 			return BaseResponse.success(constraintService.search(searchRequest));
 		} catch (Exception e) {
 			log.error("获取约束列表错误错误！" + e.getMessage(), e);
-			return BaseResponse.error();
+			return BaseResponse.error("获取约束列表错误错误！");
 		}
 	}
 }
