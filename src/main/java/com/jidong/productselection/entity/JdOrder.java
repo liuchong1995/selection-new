@@ -1,11 +1,10 @@
 package com.jidong.productselection.entity;
 
+import java.util.Date;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
-* Created by Mybatis Generator 2018/11/22
+* Created by Mybatis Generator 2018/12/15
 */
 @Data
 public class JdOrder {
@@ -40,4 +39,6 @@ public class JdOrder {
     private Integer mountHeight;
 
     private String shelfCode;
+
+    private String mainCompCode;
 }

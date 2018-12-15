@@ -9,6 +9,8 @@ import com.jidong.productselection.dto.OrderDetail;
 import com.jidong.productselection.dto.OrderItem;
 import com.jidong.productselection.entity.*;
 import com.jidong.productselection.enums.ComponentTypeEnum;
+import com.jidong.productselection.enums.InstallationEnum;
+import com.jidong.productselection.enums.VoltageEnum;
 import com.jidong.productselection.request.GenerateOrderModelNumberRequest;
 import com.jidong.productselection.request.OrderSearchRequest;
 import com.jidong.productselection.service.JdComponentService;
@@ -116,7 +118,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 	}
 
 	@Override
-	public OrderDetail getOrderDetail(Integer orderId,Boolean changeShelfCode) {
+	public OrderDetail getOrderDetail(Integer orderId, Boolean changeShelfCode) {
 		OrderDetail orderDetail = new OrderDetail();
 		JdOrder order = findOne(orderId);
 		orderDetail.setOrder(order);
@@ -125,10 +127,15 @@ public class JdOrderServiceImpl implements JdOrderService {
 		List<OrderItem> orderItems = JSON.parseArray(order.getComponentIds(), OrderItem.class);
 		List<Integer> componentIds = orderItems.stream().map(OrderItem::getCompId).collect(Collectors.toList());
 		List<JdComponent> components = componentMapper.findByComponentIdIn(componentIds);
-		if (changeShelfCode){
+		if (changeShelfCode) {
 			components.forEach(comp -> {
-				if (Objects.equals(comp.getFirstCategoryId(),product.getShelfId())){
+				if (Objects.equals(comp.getFirstCategoryId(), product.getShelfId())) {
 					comp.setComponentModelNumber(order.getShelfCode());
+				} else if (Objects.equals(comp.getFirstCategoryId(), product.getMainCateid())) {
+					String mainCompCode = order.getMainCompCode();
+					if (StringUtils.hasText(mainCompCode)) {
+						comp.setComponentModelNumber(mainCompCode);
+					}
 				}
 			});
 		}
@@ -184,7 +191,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 		List<Integer> componentIds = componentList.stream().map(JdComponent::getComponentId).collect(Collectors.toList());
 		//生成架子安装号
 		JdProduct product = productMapper.selectByPrimaryKey(order.getProductId());
-		if (product.getShelfId() != null){
+		if (product.getShelfId() != null) {
 			List<JdShelfDistinction> shelfDistinctionList = shelfDistinctionMapper.findByProductId(order.getProductId());
 			//获取最佳匹配的以获取架子后缀
 			String shelfTail = "";
@@ -221,8 +228,13 @@ public class JdOrderServiceImpl implements JdOrderService {
 			Integer installationId = product.getInstallationId();
 			List<JdComponent> shelf = componentList.stream().filter(comp -> comp.getFirstCategoryId().equals(shelfCategoryId)).collect(Collectors.toList());
 			if (!CollectionUtils.isEmpty(shelf)) {
-				shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(order.getShelfHeight()).append(CROSS_BAR);
+				//获取安装方式
 				JdComponent installation = componentList.stream().filter(comp -> comp.getFirstCategoryId().equals(installationId)).collect(Collectors.toList()).get(0);
+				if (installation.getComponentShortNumber().equals(InstallationEnum.PAPERBACK.getCode())) {
+					shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(installation.getComponentShortNumber()).append(order.getShelfHeight()).append(CROSS_BAR);
+				} else {
+					shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(order.getShelfHeight()).append(CROSS_BAR);
+				}
 				shelfCode.append(installation.getComponentShortNumber());
 				Integer mountHeight = order.getMountHeight();
 				String heightCode = mountingHeightMapper.findByHeight(mountHeight).getHeightCode();
@@ -234,6 +246,24 @@ public class JdOrderServiceImpl implements JdOrderService {
 				log.warn("未找到架子组件！");
 			}
 			order.setShelfCode(shelfCode.toString());
+			//生成主部件后缀加电压
+			List<JdComponent> voltages = componentList.stream().filter(ele -> ele.getFirstCategoryId().equals(product.getVoltageId())).collect(Collectors.toList());
+			if (voltages.size() == 0) {
+				log.warn("未找到电压！");
+			} else {
+				JdComponent voltage = voltages.get(0);
+
+				List<JdComponent> mainComps = componentList.stream().filter(ele -> ele.getFirstCategoryId().equals(product.getMainCateid())).collect(Collectors.toList());
+				if (mainComps.size() == 0) {
+					log.warn("未找到主部件！");
+				} else {
+					if (!VoltageEnum.TWO_HUNDRED.getCode().equals(Integer.parseInt(voltage.getComponentModelNumber()))) {
+						order.setMainCompCode(mainComps.get(0).getComponentModelNumber() + CROSS_BAR + voltage.getComponentModelNumber());
+					} else {
+						order.setMainCompCode(mainComps.get(0).getComponentModelNumber());
+					}
+				}
+			}
 		}
 
 		//生成componentIds
@@ -249,17 +279,17 @@ public class JdOrderServiceImpl implements JdOrderService {
 			} else {
 				componentParent = Integer.valueOf(0);
 			}
-			if (componentType.equals(ComponentTypeEnum.REALLY_COMPONENT.getCode())){
-				if (Objects.equals(component.getFirstCategoryId(),product.getShelfId())){
+			if (componentType.equals(ComponentTypeEnum.REALLY_COMPONENT.getCode())) {
+				if (Objects.equals(component.getFirstCategoryId(), product.getShelfId())) {
 					componentType = ComponentTypeEnum.SHELF.getCode();
 				}
 			}
-			if (componentType.equals(ComponentTypeEnum.VIRTUAL_COMPONENT.getCode())){
-				if (Objects.equals(component.getFirstCategoryId(),product.getInstallationId())){
+			if (componentType.equals(ComponentTypeEnum.VIRTUAL_COMPONENT.getCode())) {
+				if (Objects.equals(component.getFirstCategoryId(), product.getInstallationId())) {
 					componentType = ComponentTypeEnum.INSTALLATION.getCode();
 				}
 			}
-			orderItems.add(new OrderItem(component.getComponentId(), QTY, componentType, componentParent,component.getComponentModelNumber()));
+			orderItems.add(new OrderItem(component.getComponentId(), QTY, componentType, componentParent, component.getComponentModelNumber()));
 		}
 		order.setComponentIds(JSON.toJSONString(orderItems));
 	}

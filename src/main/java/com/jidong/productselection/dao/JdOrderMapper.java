@@ -4,11 +4,10 @@ import com.jidong.productselection.entity.JdOrder;
 import com.jidong.productselection.request.OrderSearchRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 
 /**
- * Created by Mybatis Generator 2018/11/22
+ * Created by Mybatis Generator 2018/12/15
  */
 @Mapper
 public interface JdOrderMapper {
