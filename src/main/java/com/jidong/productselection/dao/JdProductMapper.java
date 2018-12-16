@@ -1,4 +1,5 @@
 package com.jidong.productselection.dao;
+import org.apache.ibatis.annotations.Param;
 
 import com.jidong.productselection.entity.JdProduct;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,4 +24,6 @@ public interface JdProductMapper {
 	int updateByPrimaryKey(JdProduct record);
 
 	List<JdProduct> findAll();
+
+	Integer findNextProductId();
 }
