@@ -1,7 +1,7 @@
 package com.jidong.productselection.config;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/12/4 16:26
  * @Description:
  */

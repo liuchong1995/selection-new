@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/11/16 16:48
  * @Description:
  */

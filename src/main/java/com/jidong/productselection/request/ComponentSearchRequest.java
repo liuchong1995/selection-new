@@ -4,7 +4,7 @@ package com.jidong.productselection.request;
 import lombok.Data;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/10/31 10:56
  * @Description:
  */

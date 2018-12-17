@@ -8,7 +8,7 @@ import com.jidong.productselection.request.GenerateOrderModelNumberRequest;
 import com.jidong.productselection.request.OrderSearchRequest;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/10/22 09:45
  * @Description:
  */

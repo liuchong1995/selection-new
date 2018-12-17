@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/10/22 09:52
  * @Description:
  */

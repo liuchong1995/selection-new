@@ -1,7 +1,7 @@
 package com.jidong.productselection.response;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/12/3 15:43
  * @Description:
  */

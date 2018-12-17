@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/11/22 15:18
  * @Description:
  */

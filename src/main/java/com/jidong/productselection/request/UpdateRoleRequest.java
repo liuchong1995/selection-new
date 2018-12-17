@@ -3,7 +3,7 @@ package com.jidong.productselection.request;
 import lombok.Data;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/11/6 15:25
  * @Description:
  */

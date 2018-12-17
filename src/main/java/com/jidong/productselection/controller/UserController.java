@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/12/3 15:55
  * @Description:
  */

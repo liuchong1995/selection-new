@@ -5,7 +5,7 @@ import com.jidong.productselection.dto.ConstraintResult;
 import lombok.Data;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/10/25 10:51
  * @Description:
  */

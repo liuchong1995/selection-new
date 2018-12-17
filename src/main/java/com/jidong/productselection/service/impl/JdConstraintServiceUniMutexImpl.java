@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/10/25 15:59
  * @Description:
  */
@@ -90,6 +90,8 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 
 	@Override
 	public List<JdComponent> getOptionalListBySelected(Integer categoryId, List<JdComponent> selectedList) {
+		JdCategory selectedCategory = categoryMapper.selectByPrimaryKey(categoryId);
+		List<JdCategory> banCateGoryList = new ArrayList<>(getBanCategoryList(selectedCategory.getProductId(), selectedList));
 		List<JdCategory> allLeafCategory = categoryService.getAllLeafCategory(categoryId);
 		List<Integer> allComponentIds = new ArrayList<>();
 		for (JdCategory category : allLeafCategory) {
@@ -99,10 +101,16 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			return new ArrayList<>();
 		}
 		List<JdComponent> componentList = componentMapper.findByComponentIdIn(allComponentIds);
-		List<JdComponent> banComponentList = new ArrayList<>(getBanComponentList(categoryMapper.selectByPrimaryKey(categoryId).getProductId(), selectedList));
+		List<JdComponent> banComponentList = new ArrayList<>(getBanComponentList(selectedCategory.getProductId(), selectedList));
 		componentList.removeAll(banComponentList);
-		List<JdComponent> finalOptionList = componentList.stream().filter(comp -> !comp.getComponentType().equals(ComponentTypeEnum.ATTACHMENT.getCode())).collect(Collectors.toList());
+		List<JdComponent> finalOptionList = componentList.stream().filter(comp -> !comp.getComponentType().equals(ComponentTypeEnum.ATTACHMENT.getCode()) && !isMutex(banCateGoryList,comp)).collect(Collectors.toList());
 		return finalOptionList;
+	}
+
+	private Boolean isMutex(List<JdCategory> banCateGoryList,JdComponent component){
+		List<JdCategory> categoryList = componentService.getCategoryList(component);
+		categoryList.retainAll(banCateGoryList);
+		return categoryList.size() > 0 ? Boolean.TRUE : Boolean.FALSE;
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package com.jidong.productselection.service.impl;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/10/19 11:12
  * @Description: 重构为统一的互斥模型*/
 

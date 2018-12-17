@@ -3,7 +3,7 @@ package com.jidong.productselection.dto;
 import lombok.Data;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/11/22 13:56
  * @Description:
  */

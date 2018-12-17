@@ -3,7 +3,7 @@ package com.jidong.productselection.enums;
 import lombok.Getter;
 
 /**
- * @Auther: LiuChong
+ * @Author: LiuChong
  * @Date: 2018/10/23 14:17
  * @Description:
  */
