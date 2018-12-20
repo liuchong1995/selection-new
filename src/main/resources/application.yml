@@ -2,3 +2,7 @@ spring:
   # 环境 dev|prod
   profiles:
     active: dev
+ps-connect-cad:
+  exchange: jidong.ps2cad
+  pstocad-queue: orderNum
+  cadtops-queue: cadResult
