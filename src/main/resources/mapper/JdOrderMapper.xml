@@ -310,4 +310,12 @@
         select isnull(max(order_id + 1), 1) as nextorderId
         from jd_order
     </select>
+
+    <select id="findOneDayOrder" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from jd_order
+        where
+        datediff ( day, create_time , #{createTime,jdbcType=TIMESTAMP}) = 0
+    </select>
 </mapper>

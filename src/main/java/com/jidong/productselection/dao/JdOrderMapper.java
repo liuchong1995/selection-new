@@ -4,6 +4,8 @@ import com.jidong.productselection.entity.JdOrder;
 import com.jidong.productselection.request.OrderSearchRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,4 +32,6 @@ public interface JdOrderMapper {
 	int deleteByOrderId(@Param("orderId") Integer orderId);
 
 	Integer findNextOrderId();
+
+	List<JdOrder> findOneDayOrder(@Param("createTime")Date createTime);
 }

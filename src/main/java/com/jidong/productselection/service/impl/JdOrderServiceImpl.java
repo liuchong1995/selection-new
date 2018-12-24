@@ -16,6 +16,8 @@ import com.jidong.productselection.request.OrderSearchRequest;
 import com.jidong.productselection.service.JdComponentService;
 import com.jidong.productselection.service.JdConstraintService;
 import com.jidong.productselection.service.JdOrderService;
+import com.jidong.productselection.util.DateUtil;
+import com.jidong.productselection.util.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,8 @@ public class JdOrderServiceImpl implements JdOrderService {
 	private static final Integer QTY = Integer.valueOf(1);
 
 	private static final String CROSS_BAR = "-";
+
+	private static final String ORDER_PREFIX = "GZJD";
 
 	@Autowired
 	private JdOrderMapper orderMapper;
@@ -177,12 +181,41 @@ public class JdOrderServiceImpl implements JdOrderService {
 		order.setModifier(userName);
 		Integer nextOrderId = orderMapper.findNextOrderId();
 		order.setOrderId(nextOrderId);
-		order.setOrderNumber(UUID.randomUUID().toString().replace("-", ""));
+		order.setOrderNumber(generateOrderNumber(order));
 		Date now = new Date();
 		order.setCreateTime(now);
 		order.setUpdateTime(now);
 		order.setIsDeleted(false);
 		return orderMapper.insert(order);
+	}
+
+	private String generateOrderNumber(JdOrder order){
+		String serialNumber;
+		List<JdOrder> todayOrder = orderMapper.findOneDayOrder(new Date());
+		if (todayOrder == null || todayOrder.size() == 0){
+			serialNumber = "001";
+		} else {
+			List<JdOrder> orders = todayOrder.stream()
+					.filter(ele -> ele.getOrderNumber().contains(CROSS_BAR))
+					.collect(Collectors.toList());
+			if (orders.size() == 0){
+				serialNumber = "001";
+			} else {
+				Optional<Integer> max = orders.stream()
+						.map(ele -> ele.getOrderNumber().split("-")[2])
+						.map(NumberUtil::thousandToNum)
+						.max(Integer::compareTo);
+				int maxNum = max.orElse(0);
+				serialNumber = NumberUtil.formatThousand(maxNum + 1);
+			}
+
+		}
+		return ORDER_PREFIX +
+				NumberUtil.formatTen(order.getProductId()) +
+				CROSS_BAR +
+				DateUtil.getDateString(new Date()) +
+				CROSS_BAR +
+				serialNumber;
 	}
 
 	//生成componentIds以及架子安装号
