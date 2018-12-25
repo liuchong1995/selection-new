@@ -103,11 +103,11 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		List<JdComponent> componentList = componentMapper.findByComponentIdIn(allComponentIds);
 		List<JdComponent> banComponentList = new ArrayList<>(getBanComponentList(selectedCategory.getProductId(), selectedList));
 		componentList.removeAll(banComponentList);
-		List<JdComponent> finalOptionList = componentList.stream().filter(comp -> !comp.getComponentType().equals(ComponentTypeEnum.ATTACHMENT.getCode()) && !isMutex(banCateGoryList,comp)).collect(Collectors.toList());
+		List<JdComponent> finalOptionList = componentList.stream().filter(comp -> !comp.getComponentType().equals(ComponentTypeEnum.ATTACHMENT.getCode()) && !isMutex(banCateGoryList, comp)).collect(Collectors.toList());
 		return finalOptionList;
 	}
 
-	private Boolean isMutex(List<JdCategory> banCateGoryList,JdComponent component){
+	private Boolean isMutex(List<JdCategory> banCateGoryList, JdComponent component) {
 		List<JdCategory> categoryList = componentService.getCategoryList(component);
 		categoryList.retainAll(banCateGoryList);
 		return categoryList.size() > 0 ? Boolean.TRUE : Boolean.FALSE;
@@ -234,11 +234,14 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			} else if (searchRequest.getCategoryIds() != null && searchRequest.getCategoryIds().size() > 0) {
 				searchCondition
 						.setCategoryName(categoryMapper.selectByPrimaryKey(searchRequest.getCategoryIds().get(searchRequest.getCategoryIds().size() - 1)).getCategoryName());
+			} else {
+				return new PageInfo<>(mutexDescribeMapper.findByProductId(searchRequest.getProductId()));
 			}
 			String productName = productMapper.selectByPrimaryKey(searchRequest.getProductId()).getProductName();
 			searchCondition.setProductName(productName);
 			List<JdMutexDescribe> result = mutexDescribeMapper.findByConstraintSearchCondition(searchCondition);
 			return new PageInfo<>(result);
+
 		}
 	}
 
@@ -649,14 +652,14 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 	}
 
 	@Override
-	public List<JdCategory> refactorNewMenuTree(Integer productId, List<JdComponent> selectedList){
+	public List<JdCategory> refactorNewMenuTree(Integer productId, List<JdComponent> selectedList) {
 		List<JdCategory> banCateGoryList = new ArrayList<>(getBanCategoryList(productId, selectedList));
-		List<JdCategory> categoryList = categoryMapper.getNewMenuTree(productId,TOP_LEVEL);
+		List<JdCategory> categoryList = categoryMapper.getNewMenuTree(productId, TOP_LEVEL);
 		List<Integer> banCategoryIds = banCateGoryList.stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
 		List<JdCategory> tempTopCategoryList = new ArrayList<>(categoryList);
 		//顶层过滤
 		for (JdCategory topCategory : categoryList) {
-			if (banCategoryIds.contains(topCategory.getCategoryId())){
+			if (banCategoryIds.contains(topCategory.getCategoryId())) {
 				tempTopCategoryList.remove(topCategory);
 			}
 		}
@@ -665,7 +668,7 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		for (JdCategory topCategory : categoryList) {
 			List<JdCategory> tempSecondCategoryList = new ArrayList<>(topCategory.getChildren());
 			for (JdCategory secondCategory : topCategory.getChildren()) {
-				if (banCategoryIds.contains(secondCategory.getCategoryId())){
+				if (banCategoryIds.contains(secondCategory.getCategoryId())) {
 					tempSecondCategoryList.remove(secondCategory);
 				}
 			}
@@ -676,7 +679,7 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			for (JdCategory secondCategory : topCategory.getChildren()) {
 				List<JdCategory> tempThirdCategoryList = new ArrayList<>(secondCategory.getChildren());
 				for (JdCategory thirdCategory : secondCategory.getChildren()) {
-					if (banCategoryIds.contains(thirdCategory.getCategoryId())){
+					if (banCategoryIds.contains(thirdCategory.getCategoryId())) {
 						tempThirdCategoryList.remove(thirdCategory);
 					}
 				}
@@ -689,7 +692,7 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 				for (JdCategory thirdCategory : secondCategory.getChildren()) {
 					List<JdCategory> tempForthCategoryList = new ArrayList<>(thirdCategory.getChildren());
 					for (JdCategory forthCategory : thirdCategory.getChildren()) {
-						if (banCategoryIds.contains(forthCategory.getCategoryId())){
+						if (banCategoryIds.contains(forthCategory.getCategoryId())) {
 							tempForthCategoryList.remove(forthCategory);
 						}
 					}

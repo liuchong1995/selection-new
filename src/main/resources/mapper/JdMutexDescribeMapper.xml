@@ -210,7 +210,9 @@
         select
         <include refid="Base_Column_List"/>
         from jd_mutex_describe
-        where product_id=#{productId,jdbcType=INTEGER}
+        where
+        is_deleted = 0
+        and product_id=#{productId,jdbcType=INTEGER}
     </select>
 
     <select id="findByConstraintSearchCondition" resultMap="BaseResultMap">
