@@ -34,4 +34,6 @@ public interface JdCategoryService {
 	List<JdCategory> getNewMenuTree(Integer prdId,Integer parentId);
 
 	List<JdCategory> getAllNewMenuTree(Integer prdId,Integer parentId);
+
+	List<JdCategory> getAllSubCates(Integer categoryId);
 }

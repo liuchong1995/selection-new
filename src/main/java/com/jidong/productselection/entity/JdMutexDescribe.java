@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
-* Created by Mybatis Generator 2018/10/28
+* Created by Mybatis Generator 2018/12/26
 */
 @Data
 @Accessors(chain = true)
@@ -24,4 +24,8 @@ public class JdMutexDescribe {
     private String groupName;
 
     private Boolean isDeleted;
+
+    private String categories;
+
+    private String components;
 }

@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -213,5 +210,40 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 	@Override
 	public List<JdCategory> getAllNewMenuTree(Integer prdId, Integer parentId) {
 		return categoryMapper.getAllNewMenuTree(prdId,parentId);
+	}
+
+	/**
+	 * 返回该分类下所有子分类，不包括该分类
+	 * @param categoryId
+	 * @return
+	 */
+	@Override
+	public List<JdCategory> getAllSubCates(Integer categoryId) {
+		JdCategory currCategory = categoryMapper.selectByPrimaryKey(categoryId);
+		if (currCategory.getIsLeaf()) {
+			return Collections.emptyList();
+		}
+		List<JdCategory> res = new ArrayList<>();
+		List<JdCategory> secondList = categoryMapper.findByParentId(currCategory.getCategoryId());
+		if (secondList != null && secondList.size() > 0) {
+			res.addAll(secondList);
+			for (JdCategory secondCategory : secondList) {
+				if (!secondCategory.getIsLeaf()){
+					List<JdCategory> thirdList = categoryMapper.findByParentId(secondCategory.getCategoryId());
+					if (thirdList != null && thirdList.size() > 0) {
+						res.addAll(thirdList);
+						for (JdCategory thirdCategory : thirdList) {
+							if (!thirdCategory.getIsLeaf()){
+								List<JdCategory> forthList = categoryMapper.findByParentId(thirdCategory.getCategoryId());
+								if (forthList != null && forthList.size() > 0) {
+									res.addAll(forthList);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return res;
 	}
 }

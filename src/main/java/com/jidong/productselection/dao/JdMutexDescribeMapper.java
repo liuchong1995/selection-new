@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * Created by Mybatis Generator 2018/10/28
+ * Created by Mybatis Generator 2018/12/26
  */
 @Mapper
 public interface JdMutexDescribeMapper {

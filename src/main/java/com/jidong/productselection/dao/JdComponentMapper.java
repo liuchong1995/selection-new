@@ -42,6 +42,8 @@ public interface JdComponentMapper {
 
 	List<JdComponent> findByProductIdAndcomponentModelNumberOrComponentShortNumber(@Param("productId") Integer productId, @Param("componentModelNumber") String componentModelNumber, @Param("componentShortNumber") String componentShortNumber);
 
+	List<JdComponent> findByLastCategoryIdIn(@Param("lastCategoryIdList")List<Integer> lastCategoryIdList);
+
 
 
 }

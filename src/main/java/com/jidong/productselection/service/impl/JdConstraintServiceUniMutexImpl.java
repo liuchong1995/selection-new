@@ -16,9 +16,11 @@ import com.jidong.productselection.service.JdConstraintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Author: LiuChong
@@ -123,6 +125,10 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 	public int insertConstraint(ConstraintRequest constraintRequest) {
 		List<Integer> mutexIds = insertMutexes(constraintRequest);
 		JdMutexDescribe mutexDescribe = new JdMutexDescribe();
+		List<Integer> categoryIds = constraintRequest.getConstraintPremise().getCategories().stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
+		categoryIds.addAll(constraintRequest.getConstraintResult().getCategories().stream().map(JdCategory::getCategoryId).collect(Collectors.toList()));
+		List<Integer> componentIds = constraintRequest.getConstraintPremise().getComponents().stream().map(JdComponent::getComponentId).collect(Collectors.toList());
+		categoryIds.addAll(constraintRequest.getConstraintResult().getComponents().stream().map(JdComponent::getComponentId).collect(Collectors.toList()));
 		mutexDescribe.setDescribeId(mutexDescribeMapper.findNextDescribeId())
 				.setProductId(constraintRequest.getProductId())
 				.setConstraintType(constraintRequest.getConstraintOperation())
@@ -130,7 +136,9 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 				.setGroupId(constraintRequest.getGroupId())
 				.setGroupName(constraintRequest.getGroupName())
 				.setIsDeleted(false)
-				.setConstraintDesc(writeConstraintDescribe(constraintRequest));
+				.setConstraintDesc(writeConstraintDescribe(constraintRequest))
+				.setCategories(JSON.toJSONString(categoryIds))
+				.setComponents(JSON.toJSONString(componentIds));
 		return mutexDescribeMapper.insert(mutexDescribe);
 	}
 
@@ -170,13 +178,6 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 	@Override
 	@Transactional
 	public void deleteConstraints(List<Integer> constraintIds) {
-//		List<JdMutexDescribe> mutexDescribeList = mutexDescribeMapper.findByDescribeIdIn(constraintIds);
-//		List<Integer> mutexIds = new ArrayList<>();
-//		for (JdMutexDescribe mutexDescribe : mutexDescribeList) {
-//			mutexIds.addAll(JSON.parseArray(mutexDescribe.getMutexIds(),Integer.class));
-//		}
-//		uniMutexMapper.deleteByMutexIdIn(mutexIds);
-//		mutexDescribeMapper.deleteByDescribeIdIn(constraintIds);
 		for (Integer constraintId : constraintIds) {
 			deleteConstraint(constraintId);
 		}
@@ -200,7 +201,8 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		if (!shelfConstraint.getRelation().equals(EQUAL_CODE) && shelfConstraint.getRelationValue() == null) {
 			shelfConstraint.setRelationValue(0);
 		}
-		String productName = productMapper.selectByPrimaryKey(shelfConstraint.getProductId()).getProductName();
+		JdProduct product = productMapper.selectByPrimaryKey(shelfConstraint.getProductId());
+		String productName = product.getProductName();
 		String installationName = componentMapper.selectByPrimaryKey(shelfConstraint.getInstallation()).getComponentModelNumber();
 		String relation = shelfConstraint.getRelation().equals(GREATER_CODE) ? GREATER : shelfConstraint.getRelation().equals(EQUAL_CODE) ? EQUAL : LESS;
 		StringBuilder constraintDescribe = new StringBuilder();
@@ -209,6 +211,10 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			constraintDescribe.append(shelfConstraint.getRelationValue()).append(MILLIMETER);
 		}
 		JdMutexDescribe mutexDescribe = new JdMutexDescribe();
+		List<Integer> shelfAndInstallation = new ArrayList<>();
+		shelfAndInstallation.add(product.getShelfId());
+		shelfAndInstallation.add(product.getInstallationId());
+		productMapper.selectByPrimaryKey(shelfConstraint.getProductId());
 		mutexDescribe.setDescribeId(mutexDescribeMapper.findNextDescribeId())
 				.setIsDeleted(false)
 				.setGroupName(SHELF_CONSTRAINT)
@@ -216,7 +222,9 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 				.setProductId(shelfConstraint.getProductId())
 				.setGroupId(mutexDescribeMapper.findMaxGroupId() + 1)
 				.setMutexIds(JSON.toJSONString(Collections.singletonList(shelfConstraint.getConstraintId())))
-				.setConstraintDesc(constraintDescribe.toString());
+				.setConstraintDesc(constraintDescribe.toString())
+				.setCategories(JSON.toJSONString(shelfAndInstallation))
+				.setComponents(JSON.toJSONString(Collections.emptyList()));
 		mutexDescribeMapper.insert(mutexDescribe);
 		return shelfConstraintMapper.insert(shelfConstraint);
 	}
@@ -226,25 +234,69 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		if (searchRequest.getProductId() == null) {
 			return findAll(searchRequest.getPage(), searchRequest.getRows());
 		} else {
-			PageHelper.startPage(searchRequest.getPage(), searchRequest.getRows());
-			ConstraintSearchCondition searchCondition = new ConstraintSearchCondition();
+			List<JdMutexDescribe> allOneProductConstraint = mutexDescribeMapper.findByProductId(searchRequest.getProductId());
+			List<JdMutexDescribe> result = new ArrayList<>();
 			if (searchRequest.getComponentId() != null) {
-				searchCondition
-						.setComponentModelNumber(componentMapper.selectByPrimaryKey(searchRequest.getComponentId()).getComponentModelNumber());
+				List<JdMutexDescribe> tempOneProductConstraint = allOneProductConstraint.stream().filter(ele -> StringUtils.hasText(ele.getCategories()) || StringUtils.hasText(ele.getComponents())).collect(Collectors.toList());
+				List<Integer> catesOfThisComp = componentService.getCategoryList(componentMapper.selectByPrimaryKey(searchRequest.getComponentId())).stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
+				List<Integer> resIds = tempOneProductConstraint.stream().filter(ele -> {
+					boolean resOfCate = false;
+					boolean resOfComp = false;
+					if (StringUtils.hasText(ele.getCategories())) {
+						resOfCate = hasSameId(catesOfThisComp, JSON.parseArray(ele.getCategories(), Integer.class));
+					}
+					if (StringUtils.hasText(ele.getComponents())) {
+						resOfComp = hasSameId(Collections.singletonList(searchRequest.getComponentId()), JSON.parseArray(ele.getComponents(), Integer.class));
+					}
+					return resOfCate || resOfComp;
+				}).map(JdMutexDescribe::getDescribeId).collect(Collectors.toList());
+				PageHelper.startPage(searchRequest.getPage(), searchRequest.getRows());
+				if (resIds.size() > 0){
+					result = mutexDescribeMapper.findByDescribeIdIn(resIds);
+				}
 			} else if (searchRequest.getCategoryIds() != null && searchRequest.getCategoryIds().size() > 0) {
-				searchCondition
-						.setCategoryName(categoryMapper.selectByPrimaryKey(searchRequest.getCategoryIds().get(searchRequest.getCategoryIds().size() - 1)).getCategoryName());
+				List<JdMutexDescribe> tempOneProductConstraint = allOneProductConstraint.stream().filter(ele -> StringUtils.hasText(ele.getCategories()) || StringUtils.hasText(ele.getComponents())).collect(Collectors.toList());
+				Integer lastCate = searchRequest.getCategoryIds().get(searchRequest.getCategoryIds().size() - 1);
+				JdCategory lastCategory = categoryMapper.selectByPrimaryKey(lastCate);
+				List<JdComponent> allComponentsOfLastCategory = new ArrayList<>();
+				if (!lastCategory.getIsLeaf()){
+					List<Integer> allLeafCateId = categoryService.getAllLeafCategory(lastCategory.getCategoryId()).stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
+					allComponentsOfLastCategory.addAll(componentMapper.findByLastCategoryIdIn(allLeafCateId));
+				} else {
+					allComponentsOfLastCategory.addAll(componentMapper.findByLastCategoryId(lastCategory.getCategoryId()));
+				}
+				searchRequest.getCategoryIds().addAll(categoryService.getAllSubCates(lastCate).stream().map(JdCategory::getCategoryId).collect(Collectors.toList()));
+				List<Integer> allComponentIdsOfLastCategory = allComponentsOfLastCategory.stream().map(JdComponent::getComponentId).collect(Collectors.toList());
+				List<Integer> resIds = tempOneProductConstraint.stream().filter(ele -> {
+					boolean resOfCate = false;
+					boolean resOfComp = false;
+					if (StringUtils.hasText(ele.getCategories())) {
+						resOfCate = hasSameId(searchRequest.getCategoryIds(), JSON.parseArray(ele.getCategories(), Integer.class));
+					}
+					if (StringUtils.hasText(ele.getComponents())) {
+						resOfComp = hasSameId(allComponentIdsOfLastCategory, JSON.parseArray(ele.getComponents(), Integer.class));
+					}
+					return resOfCate || resOfComp;
+				}).map(JdMutexDescribe::getDescribeId).collect(Collectors.toList());
+				PageHelper.startPage(searchRequest.getPage(), searchRequest.getRows());
+				if (resIds.size() > 0){
+					result = mutexDescribeMapper.findByDescribeIdIn(resIds);
+				}
 			} else {
-				return new PageInfo<>(mutexDescribeMapper.findByProductId(searchRequest.getProductId()));
+				PageHelper.startPage(searchRequest.getPage(), searchRequest.getRows());
+				result = mutexDescribeMapper.findByDescribeIdIn(allOneProductConstraint.stream().map(JdMutexDescribe::getDescribeId).collect(Collectors.toList()));
 			}
-			String productName = productMapper.selectByPrimaryKey(searchRequest.getProductId()).getProductName();
-			searchCondition.setProductName(productName);
-			List<JdMutexDescribe> result = mutexDescribeMapper.findByConstraintSearchCondition(searchCondition);
 			return new PageInfo<>(result);
-
 		}
 	}
 
+	private boolean hasSameId(List<Integer> source, List<Integer> target) {
+		if (source.size() == 0 || target.size() == 0) {
+			return false;
+		}
+		source.retainAll(target);
+		return source.size() > 0;
+	}
 
 	private String writeConstraintDescribe(ConstraintRequest constraintRequest) {
 		StringBuilder constraintDescribe = new StringBuilder();
