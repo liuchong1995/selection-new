@@ -128,7 +128,7 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		List<Integer> categoryIds = constraintRequest.getConstraintPremise().getCategories().stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
 		categoryIds.addAll(constraintRequest.getConstraintResult().getCategories().stream().map(JdCategory::getCategoryId).collect(Collectors.toList()));
 		List<Integer> componentIds = constraintRequest.getConstraintPremise().getComponents().stream().map(JdComponent::getComponentId).collect(Collectors.toList());
-		categoryIds.addAll(constraintRequest.getConstraintResult().getComponents().stream().map(JdComponent::getComponentId).collect(Collectors.toList()));
+		componentIds.addAll(constraintRequest.getConstraintResult().getComponents().stream().map(JdComponent::getComponentId).collect(Collectors.toList()));
 		mutexDescribe.setDescribeId(mutexDescribeMapper.findNextDescribeId())
 				.setProductId(constraintRequest.getProductId())
 				.setConstraintType(constraintRequest.getConstraintOperation())
@@ -294,8 +294,9 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		if (source.size() == 0 || target.size() == 0) {
 			return false;
 		}
-		source.retainAll(target);
-		return source.size() > 0;
+		List<Integer> tempSource = new ArrayList<>(source);
+		tempSource.retainAll(target);
+		return tempSource.size() > 0;
 	}
 
 	private String writeConstraintDescribe(ConstraintRequest constraintRequest) {
