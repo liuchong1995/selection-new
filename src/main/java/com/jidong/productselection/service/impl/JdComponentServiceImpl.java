@@ -161,6 +161,7 @@ public class JdComponentServiceImpl implements JdComponentService {
 		List<Integer> toRemove = JSON.parseArray(oddCategory.getComponentsId(), Integer.class);
 		toRemove.remove(componentId);
 		oddCategory.setComponentsId(JSON.toJSONString(toRemove));
+		oddCategory.setIsLeaf(toRemove.size() > 0);
 		categoryMapper.updateByPrimaryKeySelective(oddCategory);
 		JdCategory newCategory = categoryMapper.selectByPrimaryKey(lastCategoryId);
 		List<Integer> toAdd = JSON.parseArray(newCategory.getComponentsId(), Integer.class);
@@ -169,6 +170,7 @@ public class JdComponentServiceImpl implements JdComponentService {
 		}
 		toAdd.add(componentId);
 		newCategory.setComponentsId(JSON.toJSONString(toAdd));
+		newCategory.setIsLeaf(Boolean.TRUE);
 		categoryMapper.updateByPrimaryKeySelective(newCategory);
 
 		Date now = new Date();
