@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
-* Created by Mybatis Generator 2018/12/26
+* Created by Mybatis Generator 2018/12/29
 */
 @Data
 @Accessors(chain = true)
@@ -28,4 +28,6 @@ public class JdMutexDescribe {
     private String categories;
 
     private String components;
+
+    private String regenerateRequest;
 }

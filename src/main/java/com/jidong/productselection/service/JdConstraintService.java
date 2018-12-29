@@ -44,4 +44,6 @@ public interface JdConstraintService {
 	List<JdComponent> getBanComponentList(Integer productId, List<JdComponent> selectedComponents);
 
 	List<JdCategory> getCategories(List<JdComponent> selectedList);
+
+	void regenerate(List<JdMutexDescribe> mutexDescribes);
 }

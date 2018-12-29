@@ -4,22 +4,19 @@ import com.jidong.productselection.entity.JdCategory;
 import com.jidong.productselection.entity.JdComponent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 /**
  * @Author: LiuChong
- * @Date: 2018/10/25 10:54
+ * @Date: 2018/12/29 22:09
  * @Description:
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class ConstraintResult {
+public class ReConstraintPremise {
 
-	private List<JdCategory> categories;
+	private List<Integer> categoryIds;
 
-	private List<JdComponent> components;
-
+	private List<Integer> componentIds;
 }

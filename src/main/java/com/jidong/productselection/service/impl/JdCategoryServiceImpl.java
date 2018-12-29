@@ -2,11 +2,16 @@ package com.jidong.productselection.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.jidong.productselection.dao.JdCategoryMapper;
+import com.jidong.productselection.dao.JdMutexDescribeMapper;
 import com.jidong.productselection.dao.JdProductMapper;
 import com.jidong.productselection.entity.JdCategory;
+import com.jidong.productselection.entity.JdMutexDescribe;
 import com.jidong.productselection.entity.JdProduct;
+import com.jidong.productselection.enums.ConstraintOperationEnum;
 import com.jidong.productselection.request.CategoryAddRequest;
 import com.jidong.productselection.service.JdCategoryService;
+import com.jidong.productselection.service.JdConstraintService;
+import com.jidong.productselection.util.ConstraintUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +36,15 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 
 	@Autowired
 	private JdProductMapper productMapper;
+
+	@Autowired
+	private JdMutexDescribeMapper mutexDescribeMapper;
+
+	@Autowired
+	private ConstraintUtil constraintUtil;
+
+	@Autowired
+	private JdConstraintService constraintService;
 
 	@Override
 	public String getMenuTree(Integer prdId) {
@@ -158,7 +172,11 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 			}
 			productMapper.updateByPrimaryKeySelective(product);
 		}
-		return categoryMapper.insert(category);
+		int num =  categoryMapper.insert(category);
+		List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(productId, ConstraintOperationEnum.ONLY_BE_USED.getCode());
+		List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(category, ele)).collect(Collectors.toList());
+		constraintService.regenerate(needRegenerateList);
+		return num;
 	}
 
 	@Override

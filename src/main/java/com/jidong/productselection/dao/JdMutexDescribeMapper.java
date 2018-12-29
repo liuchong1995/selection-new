@@ -1,13 +1,10 @@
 package com.jidong.productselection.dao;
-import com.jidong.productselection.dto.ConstraintSearchCondition;
-import com.jidong.productselection.entity.JdMutexDescribe;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.jidong.productselection.dto.ConstraintSearchCondition;import com.jidong.productselection.entity.JdMutexDescribe;
+import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;
 
 /**
- * Created by Mybatis Generator 2018/12/26
+ * Created by Mybatis Generator 2018/12/29
  */
 @Mapper
 public interface JdMutexDescribeMapper {
@@ -20,6 +17,8 @@ public interface JdMutexDescribeMapper {
 	JdMutexDescribe selectByPrimaryKey(Integer describeId);
 
 	int updateByPrimaryKeySelective(JdMutexDescribe record);
+
+	int updateByPrimaryKeyWithBLOBs(JdMutexDescribe record);
 
 	int updateByPrimaryKey(JdMutexDescribe record);
 
@@ -38,4 +37,6 @@ public interface JdMutexDescribeMapper {
 	List<JdMutexDescribe> findByProductId(@Param("productId") Integer productId);
 
 	List<JdMutexDescribe> findByConstraintSearchCondition(@Param("searchCondition") ConstraintSearchCondition searchCondition);
+
+	List<JdMutexDescribe> findByProductIdAndConstraintType(@Param("productId")Integer productId,@Param("constraintType")Integer constraintType);
 }

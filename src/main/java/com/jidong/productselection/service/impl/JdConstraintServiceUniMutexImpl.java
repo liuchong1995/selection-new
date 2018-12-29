@@ -13,6 +13,7 @@ import com.jidong.productselection.request.ConstraintSearchRequest;
 import com.jidong.productselection.service.JdCategoryService;
 import com.jidong.productselection.service.JdComponentService;
 import com.jidong.productselection.service.JdConstraintService;
+import com.jidong.productselection.util.ConstraintUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +21,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @Author: LiuChong
@@ -69,6 +69,9 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 
 	@Autowired
 	private JdProductMapper productMapper;
+
+	@Autowired
+	private ConstraintUtil constraintUtil;
 
 	@Override
 	public String refactorMenuTree(Integer productId, List<JdComponent> selectedList) {
@@ -138,7 +141,8 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 				.setIsDeleted(false)
 				.setConstraintDesc(writeConstraintDescribe(constraintRequest))
 				.setCategories(JSON.toJSONString(categoryIds))
-				.setComponents(JSON.toJSONString(componentIds));
+				.setComponents(JSON.toJSONString(componentIds))
+				.setRegenerateRequest(JSON.toJSONString(constraintUtil.convertToStore(constraintRequest)));
 		return mutexDescribeMapper.insert(mutexDescribe);
 	}
 
@@ -702,6 +706,16 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			}
 		}
 		return categories;
+	}
+
+	@Override
+	@Transactional
+	public void regenerate(List<JdMutexDescribe> mutexDescribes) {
+		for (JdMutexDescribe mutexDescribe : mutexDescribes) {
+			deleteConstraint(mutexDescribe.getDescribeId());
+			ConstraintRequest constraintRequest = constraintUtil.convertToRequest(JSON.parseObject(mutexDescribe.getRegenerateRequest(), ReGenerateConstraint.class));
+			insertConstraint(constraintRequest);
+		}
 	}
 
 	@Override

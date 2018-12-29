@@ -2,7 +2,9 @@ package com.jidong.productselection.dto;
 
 import com.jidong.productselection.entity.JdCategory;
 import com.jidong.productselection.entity.JdComponent;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -12,6 +14,8 @@ import java.util.List;
  * @Description:
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ConstraintPremise {
 
 	private List<JdCategory> categories;

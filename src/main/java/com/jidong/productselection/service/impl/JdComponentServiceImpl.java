@@ -5,20 +5,24 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jidong.productselection.dao.JdCategoryMapper;
 import com.jidong.productselection.dao.JdComponentMapper;
+import com.jidong.productselection.dao.JdMutexDescribeMapper;
 import com.jidong.productselection.dao.JdProductMapper;
 import com.jidong.productselection.dto.ComponentDetail;
 import com.jidong.productselection.entity.JdCategory;
 import com.jidong.productselection.entity.JdComponent;
+import com.jidong.productselection.entity.JdMutexDescribe;
 import com.jidong.productselection.entity.JdProduct;
 import com.jidong.productselection.enums.ComponentTypeEnum;
+import com.jidong.productselection.enums.ConstraintOperationEnum;
 import com.jidong.productselection.request.ComponentAddRequest;
 import com.jidong.productselection.request.ComponentSearchRequest;
 import com.jidong.productselection.service.JdCategoryService;
 import com.jidong.productselection.service.JdComponentService;
+import com.jidong.productselection.service.JdConstraintService;
+import com.jidong.productselection.util.ConstraintUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +56,15 @@ public class JdComponentServiceImpl implements JdComponentService {
 
 	@Autowired
 	private JdCategoryService categoryService;
+
+	@Autowired
+	private JdMutexDescribeMapper mutexDescribeMapper;
+
+	@Autowired
+	private ConstraintUtil constraintUtil;
+
+	@Autowired
+	private JdConstraintService constraintService;
 
 	@Override
 	public List<JdComponent> findByCategory(Integer categoryId) {
@@ -141,7 +154,11 @@ public class JdComponentServiceImpl implements JdComponentService {
 		component.setUpdateTime(now);
 		component.setCreator(componentAddRequest.getCreator());
 		component.setIsDeleted(false);
-		return componentMapper.insertSelective(component);
+		int num =  componentMapper.insertSelective(component);
+		List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(componentAddRequest.getProductId(), ConstraintOperationEnum.ONLY_BE_USED.getCode());
+		List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(component, ele)).collect(Collectors.toList());
+		constraintService.regenerate(needRegenerateList);
+		return num;
 	}
 
 	@Override
@@ -175,7 +192,12 @@ public class JdComponentServiceImpl implements JdComponentService {
 
 		Date now = new Date();
 		component.setUpdateTime(now);
-		return componentMapper.updateByPrimaryKey(component);
+
+		int num = componentMapper.updateByPrimaryKey(component);
+		List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(componentAddRequest.getProductId(), ConstraintOperationEnum.ONLY_BE_USED.getCode());
+		List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(component, ele)).collect(Collectors.toList());
+		constraintService.regenerate(needRegenerateList);
+		return num;
 	}
 
 	@Override
