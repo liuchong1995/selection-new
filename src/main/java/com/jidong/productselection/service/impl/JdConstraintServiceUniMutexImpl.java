@@ -288,7 +288,10 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 				}
 			} else {
 				PageHelper.startPage(searchRequest.getPage(), searchRequest.getRows());
-				result = mutexDescribeMapper.findByDescribeIdIn(allOneProductConstraint.stream().map(JdMutexDescribe::getDescribeId).collect(Collectors.toList()));
+				List<Integer> descIds = allOneProductConstraint.stream().map(JdMutexDescribe::getDescribeId).collect(Collectors.toList());
+				if (descIds.size() > 0){
+					result = mutexDescribeMapper.findByDescribeIdIn(descIds);
+				}
 			}
 			return new PageInfo<>(result);
 		}
