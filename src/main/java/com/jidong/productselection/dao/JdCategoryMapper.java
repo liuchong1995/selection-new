@@ -1,14 +1,10 @@
 package com.jidong.productselection.dao;
 
 import com.jidong.productselection.entity.JdCategory;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Map;
+import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;import java.util.Map;
 
 /**
- * Created by Mybatis Generator 2018/11/22
+ * Created by Mybatis Generator 2019/01/08
  */
 @Mapper
 public interface JdCategoryMapper {
@@ -40,11 +36,11 @@ public interface JdCategoryMapper {
 
 	List<JdCategory> findByParentId(@Param("parentId") Integer parentId);
 
-    List<JdCategory> getNewMenuTree(@Param("prdId") Integer prdId,@Param("parentId") Integer parentId);
+	List<JdCategory> getNewMenuTree(@Param("prdId") Integer prdId, @Param("parentId") Integer parentId);
 
-    List<JdCategory> getAllNewMenuTree(@Param("prdId") Integer prdId,@Param("parentId") Integer parentId);
+	List<JdCategory> getAllNewMenuTree(@Param("prdId") Integer prdId, @Param("parentId") Integer parentId);
 
-    List<JdCategory> selectCateChildren(@Param("parentId") Integer parentId);
+	List<JdCategory> selectCateChildren(@Param("parentId") Integer parentId);
 
-    List<JdCategory> selectAllCateChildren(@Param("parentId") Integer parentId);
+	List<JdCategory> selectAllCateChildren(@Param("parentId") Integer parentId);
 }

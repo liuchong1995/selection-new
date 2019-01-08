@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* Created by Mybatis Generator 2018/11/22
+* Created by Mybatis Generator 2019/01/08
 */
 @Data
 @Accessors(chain = true)
@@ -31,6 +31,8 @@ public class JdCategory {
     private String categoryProperties;
 
     private Boolean isShow;
+
+    private Boolean isDeleted;
 
     private List<JdCategory> children = new ArrayList<>();
 }

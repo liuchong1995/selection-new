@@ -140,7 +140,8 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 				.setCategoryName(categoryAddRequest.getNewCategoryName())
 				.setProductId(productId)
 				.setIsLeaf(false)
-				.setIsShow(categoryAddRequest.getIsShow());
+				.setIsShow(categoryAddRequest.getIsShow())
+				.setIsDeleted(false);
 		if (!preCategories.isEmpty()) {
 			JdCategory parentCategory = preCategories.get(preCategories.size() - 1);
 			category.setParentId(parentCategory.getCategoryId())
@@ -151,9 +152,9 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		} else {
 			category.setParentId(TOP_LEVEL)
 					.setCategoryLevel(TOP_LEVEL);
-			if (categoryAddRequest.getCategoryOrder() != null){
+			if (categoryAddRequest.getCategoryOrder() != null) {
 				List<Integer> orders = categoryMapper.findByProductIdAndParentId(productId, TOP_LEVEL).stream().map(JdCategory::getCategoryOrder).collect(Collectors.toList());
-				if (!orders.contains(categoryAddRequest.getCategoryOrder())){
+				if (!orders.contains(categoryAddRequest.getCategoryOrder())) {
 					category.setCategoryOrder(categoryAddRequest.getCategoryOrder());
 				} else {
 					throw new RuntimeException("已存在序号");
@@ -161,18 +162,18 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 			}
 			Integer categoryId = category.getCategoryId();
 			JdProduct product = productMapper.selectByPrimaryKey(productId);
-			if (categoryAddRequest.getIsMainCate()){
+			if (categoryAddRequest.getIsMainCate()) {
 				product.setMainCateid(categoryId);
-			} else if(categoryAddRequest.getIsInstallation()){
+			} else if (categoryAddRequest.getIsInstallation()) {
 				product.setInstallationId(categoryId);
-			} else if (categoryAddRequest.getIsShelf()){
+			} else if (categoryAddRequest.getIsShelf()) {
 				product.setShelfId(categoryId);
-			} else if (categoryAddRequest.getIsVoltage()){
+			} else if (categoryAddRequest.getIsVoltage()) {
 				product.setVoltageId(categoryId);
 			}
 			productMapper.updateByPrimaryKeySelective(product);
 		}
-		int num =  categoryMapper.insert(category);
+		int num = categoryMapper.insert(category);
 		List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(productId, ConstraintOperationEnum.ONLY_BE_USED.getCode());
 		List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(category, ele)).collect(Collectors.toList());
 		constraintService.regenerate(needRegenerateList);
@@ -222,16 +223,17 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 
 	@Override
 	public List<JdCategory> getNewMenuTree(Integer prdId, Integer parentId) {
-		return categoryMapper.getNewMenuTree(prdId,parentId);
+		return categoryMapper.getNewMenuTree(prdId, parentId);
 	}
 
 	@Override
 	public List<JdCategory> getAllNewMenuTree(Integer prdId, Integer parentId) {
-		return categoryMapper.getAllNewMenuTree(prdId,parentId);
+		return categoryMapper.getAllNewMenuTree(prdId, parentId);
 	}
 
 	/**
 	 * 返回该分类下所有子分类，不包括该分类
+	 *
 	 * @param categoryId
 	 * @return
 	 */
@@ -246,12 +248,12 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		if (secondList != null && secondList.size() > 0) {
 			res.addAll(secondList);
 			for (JdCategory secondCategory : secondList) {
-				if (!secondCategory.getIsLeaf()){
+				if (!secondCategory.getIsLeaf()) {
 					List<JdCategory> thirdList = categoryMapper.findByParentId(secondCategory.getCategoryId());
 					if (thirdList != null && thirdList.size() > 0) {
 						res.addAll(thirdList);
 						for (JdCategory thirdCategory : thirdList) {
-							if (!thirdCategory.getIsLeaf()){
+							if (!thirdCategory.getIsLeaf()) {
 								List<JdCategory> forthList = categoryMapper.findByParentId(thirdCategory.getCategoryId());
 								if (forthList != null && forthList.size() > 0) {
 									res.addAll(forthList);
