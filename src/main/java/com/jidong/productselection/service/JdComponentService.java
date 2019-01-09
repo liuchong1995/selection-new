@@ -17,6 +17,8 @@ import java.util.List;
 public interface JdComponentService {
 	List<JdComponent> findByCategory(Integer categoryId);
 
+	List<JdComponent> findByCategoryIncludeAttachment(Integer categoryId);
+
 	JdComponent findById(Integer componentId);
 
 	List<Integer> excludePeerComponent(JdComponent component, List<Integer> excludeAllCategoryIds);

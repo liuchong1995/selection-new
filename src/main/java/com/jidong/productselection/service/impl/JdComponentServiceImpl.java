@@ -82,6 +82,19 @@ public class JdComponentServiceImpl implements JdComponentService {
 	}
 
 	@Override
+	public List<JdComponent> findByCategoryIncludeAttachment(Integer categoryId) {
+		List<JdCategory> allLeafCategory = categoryService.getAllLeafCategory(categoryId);
+		List<Integer> allComponentIds = new ArrayList<>();
+		for (JdCategory category : allLeafCategory) {
+			allComponentIds.addAll(JSON.parseArray(category.getComponentsId(),Integer.class));
+		}
+		if (allComponentIds.size() == 0){
+			return new ArrayList<>();
+		}
+		return componentMapper.findByComponentIdIn(allComponentIds);
+	}
+
+	@Override
 	public JdComponent findById(Integer componentId) {
 		return componentMapper.selectByPrimaryKey(componentId);
 	}
@@ -215,7 +228,7 @@ public class JdComponentServiceImpl implements JdComponentService {
 			categoryMapper.updateByPrimaryKeySelective(category);
 			return componentMapper.updateIsDeletedByComponentId(Boolean.TRUE,componentId);
 		} else {
-			if (category.getIsLeaf()) {
+			if (!category.getIsLeaf()) {
 				category.setComponentsId(JSON.toJSONString(Collections.singletonList(componentId)));
 				category.setIsLeaf(false);
 			} else {
@@ -223,6 +236,7 @@ public class JdComponentServiceImpl implements JdComponentService {
 				compIds.add(componentId);
 				category.setComponentsId(JSON.toJSONString(compIds));
 			}
+			categoryMapper.updateByPrimaryKeySelective(category);
 			return componentMapper.updateIsDeletedByComponentId(Boolean.FALSE,componentId);
 		}
 	}

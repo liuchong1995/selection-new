@@ -1,6 +1,7 @@
 package com.jidong.productselection.service;
 
 import com.jidong.productselection.entity.JdCategory;
+import com.jidong.productselection.entity.JdComponent;
 import com.jidong.productselection.request.CategoryAddRequest;
 
 import java.util.List;
@@ -36,4 +37,6 @@ public interface JdCategoryService {
 	List<JdCategory> getAllNewMenuTree(Integer prdId,Integer parentId);
 
 	List<JdCategory> getAllSubCates(Integer categoryId);
+
+	Map<Integer, List<JdComponent>> partitionComp(List<JdComponent> jdComponents);
 }

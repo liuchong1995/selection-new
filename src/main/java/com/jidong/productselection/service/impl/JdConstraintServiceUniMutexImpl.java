@@ -351,16 +351,20 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			//仅可用时获取反向互斥类型及部件
 			Set<Integer> excludeCategoryIds = new HashSet<>();
 			Set<Integer> excludeComponentIds = new HashSet<>();
+			Set<Integer> containCategoryIds = new HashSet<>();
+			Set<Integer> containComponentIds = new HashSet<>();
 			for (JdComponent resultComponent : resultComponents) {
 				JdCategory lastCategory = categoryMapper.selectByPrimaryKey(resultComponent.getLastCategoryId());
 				List<Integer> tempExcludeCategoryIds = categoryService.excludeAllCategory(lastCategory);
 				excludeCategoryIds.addAll(tempExcludeCategoryIds);
 				List<Integer> tempExcludeComponentIds = componentService.excludePeerComponent(resultComponent, tempExcludeCategoryIds);
 				excludeComponentIds.addAll(tempExcludeComponentIds);
+				containCategoryIds.addAll(componentService.getCategoryList(resultComponent).stream().map(JdCategory::getCategoryId).collect(Collectors.toSet()));
 			}
 			for (JdCategory resultCategory : resultCategories) {
 				List<Integer> tempExcludeCategoryIds = categoryService.excludeAllCategory(resultCategory);
 				excludeCategoryIds.addAll(tempExcludeCategoryIds);
+				containComponentIds.addAll(componentService.findByCategoryIncludeAttachment(resultCategory.getCategoryId()).stream().map(JdComponent::getComponentId).collect(Collectors.toSet()));
 			}
 			allResultCategoryIds.addAll(excludeCategoryIds);
 			allResultComponentIds.addAll(excludeComponentIds);
@@ -370,6 +374,10 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			for (JdComponent premiseComponent : premiseComponents) {
 				allPremiseComponentIds.add(premiseComponent.getComponentId());
 			}
+			allResultCategoryIds.removeAll(resultCategories.stream().map(JdCategory::getCategoryId).collect(Collectors.toList()));
+			allResultCategoryIds.removeAll(containCategoryIds);
+			allResultComponentIds.removeAll(resultComponents.stream().map(JdComponent::getComponentId).collect(Collectors.toList()));
+			allResultComponentIds.removeAll(containComponentIds);
 			JdUniMutex uniMutex = new JdUniMutex();
 			Integer nextMutexId = uniMutexMapper.findNextMutexId();
 			MixPremiseOrResultIds mixPremiseIds = new MixPremiseOrResultIds();

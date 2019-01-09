@@ -5,6 +5,7 @@ import com.jidong.productselection.dao.JdCategoryMapper;
 import com.jidong.productselection.dao.JdMutexDescribeMapper;
 import com.jidong.productselection.dao.JdProductMapper;
 import com.jidong.productselection.entity.JdCategory;
+import com.jidong.productselection.entity.JdComponent;
 import com.jidong.productselection.entity.JdMutexDescribe;
 import com.jidong.productselection.entity.JdProduct;
 import com.jidong.productselection.enums.ConstraintOperationEnum;
@@ -265,5 +266,24 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 			}
 		}
 		return res;
+	}
+
+	/**
+	 * 按照最后一级分类分成不同的分组
+	 * @param jdComponents
+	 * @return
+	 */
+	@Override
+	public Map<Integer, List<JdComponent>> partitionComp(List<JdComponent> jdComponents) {
+		Map<Integer,List<JdComponent>> partitionCompMap = new HashMap<>();
+		for (JdComponent component : jdComponents) {
+			if (partitionCompMap.containsKey(component.getLastCategoryId())){
+				List<JdComponent> componentList = partitionCompMap.get(component.getLastCategoryId());
+				componentList.add(component);
+			} else {
+				partitionCompMap.put(component.getLastCategoryId(),new ArrayList<>(Collections.singleton(component)));
+			}
+		}
+		return partitionCompMap;
 	}
 }
