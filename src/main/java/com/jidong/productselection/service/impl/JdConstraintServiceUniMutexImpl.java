@@ -100,7 +100,9 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		List<JdCategory> allLeafCategory = categoryService.getAllLeafCategory(categoryId);
 		List<Integer> allComponentIds = new ArrayList<>();
 		for (JdCategory category : allLeafCategory) {
-			allComponentIds.addAll(JSON.parseArray(category.getComponentsId(), Integer.class));
+			if (StringUtils.hasText(category.getComponentsId())){
+				allComponentIds.addAll(JSON.parseArray(category.getComponentsId(), Integer.class));
+			}
 		}
 		if (allComponentIds.size() == 0) {
 			return new ArrayList<>();

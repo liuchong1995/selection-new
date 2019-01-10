@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,7 +72,9 @@ public class JdComponentServiceImpl implements JdComponentService {
 		List<JdCategory> allLeafCategory = categoryService.getAllLeafCategory(categoryId);
 		List<Integer> allComponentIds = new ArrayList<>();
 		for (JdCategory category : allLeafCategory) {
-			allComponentIds.addAll(JSON.parseArray(category.getComponentsId(),Integer.class));
+			if (StringUtils.hasText(category.getComponentsId())){
+				allComponentIds.addAll(JSON.parseArray(category.getComponentsId(),Integer.class));
+			}
 		}
 		if (allComponentIds.size() == 0){
 			return new ArrayList<>();
