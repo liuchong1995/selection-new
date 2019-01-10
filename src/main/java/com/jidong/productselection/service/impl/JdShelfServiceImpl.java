@@ -43,9 +43,11 @@ public class JdShelfServiceImpl implements JdShelfService {
 		Map<Integer, List<ShelfHeight>> map = new HashMap<>();
 		if (product.getShelfId() != null){
 			List<JdComponent> shelfList = componentMapper.findByFirstCategoryId(product.getShelfId());
-			List<JdBracketHeight> bracketHeight = bracketHeightMapper.findByBracketIdIn(shelfList.stream().map(JdComponent::getComponentId).collect(Collectors.toList()));
-			for (JdBracketHeight height : bracketHeight) {
-				map.put(height.getBracketId(), JSON.parseArray(height.getHeights(), ShelfHeight.class));
+			if (shelfList != null && shelfList.size() > 0){
+				List<JdBracketHeight> bracketHeight = bracketHeightMapper.findByBracketIdIn(shelfList.stream().map(JdComponent::getComponentId).collect(Collectors.toList()));
+				for (JdBracketHeight height : bracketHeight) {
+					map.put(height.getBracketId(), JSON.parseArray(height.getHeights(), ShelfHeight.class));
+				}
 			}
 		}
 		return map;
