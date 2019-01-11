@@ -505,50 +505,64 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 				allResultComponentIds.add(premiseComponent.getComponentId());
 			}
 			//逻辑貌似错了...统一为两个部件和分类 两个遍历试试
-			List<Integer> allMutexCategoryIds = new ArrayList<>(allPremiseCategoryIds);
+			/*List<Integer> allMutexCategoryIds = new ArrayList<>(allPremiseCategoryIds);
 			allMutexCategoryIds.addAll(allResultCategoryIds);
 			List<Integer> allMutexComponentIds = new ArrayList<>(allPremiseComponentIds);
-			allMutexComponentIds.addAll(allResultComponentIds);
+			allMutexComponentIds.addAll(allResultComponentIds);*/
 
-			for (Integer mutexCategoryId : allMutexCategoryIds) {
-				JdUniMutex uniMutex = new JdUniMutex();
-				Integer nextMutexId = uniMutexMapper.findNextMutexId();
-				MixPremiseOrResultIds mixPremiseIds = new MixPremiseOrResultIds();
-				MixPremiseOrResultIds mixResultIds = new MixPremiseOrResultIds();
-				List<Integer> tempAllMutexCategoryIds = new ArrayList<>(allMutexCategoryIds);
-				tempAllMutexCategoryIds.remove(mutexCategoryId);
-				mixPremiseIds.setCategoryIds(tempAllMutexCategoryIds);
-				mixPremiseIds.setComponentIds(allMutexComponentIds);
-				mixResultIds.setCategoryIds(Collections.singletonList(mutexCategoryId));
-				mixResultIds.setComponentIds(Collections.emptyList());
-				uniMutex.setMutexId(nextMutexId)
-						.setProductId(constraintRequest.getProductId())
-						.setMutexPremise(JSON.toJSONString(mixPremiseIds))
-						.setMutextResult(JSON.toJSONString(mixResultIds))
-						.setIsDeleted(false);
-				uniMutexMapper.insert(uniMutex);
-				mutexIds.add(uniMutex.getMutexId());
+			ArrayList<JdCategory> allCate = new ArrayList<>(premiseCategories);
+			allCate.addAll(resultCategories);
+			ArrayList<JdComponent> allComp = new ArrayList<>(premiseComponents);
+			allComp.addAll(resultComponents);
+			List<List<JdCategory>> groupCate = categoryService.groupCate(categoryService.partitionCate(allCate));
+			List<List<JdComponent>> groupComp = categoryService.groupComp(categoryService.partitionComp(allComp));
+			for (List<JdCategory> oneGroupCate : groupCate) {
+				List<Integer> allMutexCategoryIds = oneGroupCate.stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
+				for (List<JdComponent> oneGroupComp : groupComp) {
+					List<Integer> allMutexComponentIds = oneGroupComp.stream().map(JdComponent::getComponentId).collect(Collectors.toList());
+					for (Integer mutexCategoryId : allMutexCategoryIds) {
+						JdUniMutex uniMutex = new JdUniMutex();
+						Integer nextMutexId = uniMutexMapper.findNextMutexId();
+						MixPremiseOrResultIds mixPremiseIds = new MixPremiseOrResultIds();
+						MixPremiseOrResultIds mixResultIds = new MixPremiseOrResultIds();
+						List<Integer> tempAllMutexCategoryIds = new ArrayList<>(allMutexCategoryIds);
+						tempAllMutexCategoryIds.remove(mutexCategoryId);
+						mixPremiseIds.setCategoryIds(tempAllMutexCategoryIds);
+						mixPremiseIds.setComponentIds(allMutexComponentIds);
+						mixResultIds.setCategoryIds(Collections.singletonList(mutexCategoryId));
+						mixResultIds.setComponentIds(Collections.emptyList());
+						uniMutex.setMutexId(nextMutexId)
+								.setProductId(constraintRequest.getProductId())
+								.setMutexPremise(JSON.toJSONString(mixPremiseIds))
+								.setMutextResult(JSON.toJSONString(mixResultIds))
+								.setIsDeleted(false);
+						uniMutexMapper.insert(uniMutex);
+						mutexIds.add(uniMutex.getMutexId());
+					}
+
+					for (Integer mutexComponentId : allMutexComponentIds) {
+						JdUniMutex uniMutex = new JdUniMutex();
+						Integer nextMutexId = uniMutexMapper.findNextMutexId();
+						MixPremiseOrResultIds mixPremiseIds = new MixPremiseOrResultIds();
+						MixPremiseOrResultIds mixResultIds = new MixPremiseOrResultIds();
+						List<Integer> tempAllMutexComponentIds = new ArrayList<>(allMutexComponentIds);
+						tempAllMutexComponentIds.remove(mutexComponentId);
+						mixPremiseIds.setCategoryIds(allMutexCategoryIds);
+						mixPremiseIds.setComponentIds(tempAllMutexComponentIds);
+						mixResultIds.setCategoryIds(Collections.emptyList());
+						mixResultIds.setComponentIds(Collections.singletonList(mutexComponentId));
+						uniMutex.setMutexId(nextMutexId)
+								.setProductId(constraintRequest.getProductId())
+								.setMutexPremise(JSON.toJSONString(mixPremiseIds))
+								.setMutextResult(JSON.toJSONString(mixResultIds))
+								.setIsDeleted(false);
+						uniMutexMapper.insert(uniMutex);
+						mutexIds.add(uniMutex.getMutexId());
+					}
+				}
 			}
 
-			for (Integer mutexComponentId : allMutexComponentIds) {
-				JdUniMutex uniMutex = new JdUniMutex();
-				Integer nextMutexId = uniMutexMapper.findNextMutexId();
-				MixPremiseOrResultIds mixPremiseIds = new MixPremiseOrResultIds();
-				MixPremiseOrResultIds mixResultIds = new MixPremiseOrResultIds();
-				List<Integer> tempAllMutexComponentIds = new ArrayList<>(allMutexComponentIds);
-				tempAllMutexComponentIds.remove(mutexComponentId);
-				mixPremiseIds.setCategoryIds(allMutexCategoryIds);
-				mixPremiseIds.setComponentIds(tempAllMutexComponentIds);
-				mixResultIds.setCategoryIds(Collections.emptyList());
-				mixResultIds.setComponentIds(Collections.singletonList(mutexComponentId));
-				uniMutex.setMutexId(nextMutexId)
-						.setProductId(constraintRequest.getProductId())
-						.setMutexPremise(JSON.toJSONString(mixPremiseIds))
-						.setMutextResult(JSON.toJSONString(mixResultIds))
-						.setIsDeleted(false);
-				uniMutexMapper.insert(uniMutex);
-				mutexIds.add(uniMutex.getMutexId());
-			}
+
 		}
 		//附件关系时单独处理
 		else if (constraintRequest.getConstraintOperation().equals(ConstraintOperationEnum.ATTACHMENT.getCode())) {

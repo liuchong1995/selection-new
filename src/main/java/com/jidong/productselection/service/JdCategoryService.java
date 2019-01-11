@@ -39,4 +39,10 @@ public interface JdCategoryService {
 	List<JdCategory> getAllSubCates(Integer categoryId);
 
 	Map<Integer, List<JdComponent>> partitionComp(List<JdComponent> jdComponents);
+
+	Map<Integer, List<JdCategory>> partitionCate(List<JdCategory> jdCategories);
+
+	List<List<JdComponent>> groupComp(Map<Integer, List<JdComponent>> compListMap);
+
+	List<List<JdCategory>> groupCate(Map<Integer, List<JdCategory>> cateListMap);
 }

@@ -270,20 +270,116 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 
 	/**
 	 * 按照最后一级分类分成不同的分组
+	 *
 	 * @param jdComponents
 	 * @return
 	 */
 	@Override
 	public Map<Integer, List<JdComponent>> partitionComp(List<JdComponent> jdComponents) {
-		Map<Integer,List<JdComponent>> partitionCompMap = new HashMap<>();
+		Map<Integer, List<JdComponent>> partitionCompMap = new HashMap<>();
 		for (JdComponent component : jdComponents) {
-			if (partitionCompMap.containsKey(component.getLastCategoryId())){
+			if (partitionCompMap.containsKey(component.getLastCategoryId())) {
 				List<JdComponent> componentList = partitionCompMap.get(component.getLastCategoryId());
 				componentList.add(component);
 			} else {
-				partitionCompMap.put(component.getLastCategoryId(),new ArrayList<>(Collections.singleton(component)));
+				partitionCompMap.put(component.getLastCategoryId(), new ArrayList<>(Collections.singleton(component)));
 			}
 		}
 		return partitionCompMap;
+	}
+
+	@Override
+	public Map<Integer, List<JdCategory>> partitionCate(List<JdCategory> jdCategories) {
+		Map<Integer, List<JdCategory>> partitionCateMap = new HashMap<>();
+		for (JdCategory category : jdCategories) {
+			if (category.getParentId().equals(TOP_LEVEL)) {
+				partitionCateMap.put(category.getCategoryId(), new ArrayList<>(Collections.singleton(category)));
+			} else {
+				JdCategory topCate = getTopCate(category);
+				if (partitionCateMap.containsKey(topCate.getCategoryId())) {
+					List<JdCategory> categoryList = partitionCateMap.get(topCate.getCategoryId());
+					categoryList.add(category);
+				} else {
+					partitionCateMap.put(topCate.getCategoryId(), new ArrayList<>(Collections.singleton(category)));
+				}
+			}
+		}
+		return partitionCateMap;
+	}
+
+	@Override
+	public List<List<JdComponent>> groupComp(Map<Integer, List<JdComponent>> compListMap) {
+		List<List<JdComponent>> res = new ArrayList<>();
+		for (Map.Entry<Integer, List<JdComponent>> entry : compListMap.entrySet()) {
+			int times = entry.getValue().size();
+			if (times == 1) {
+				if (res.size() > 0) {
+					for (List<JdComponent> re : res) {
+						re.add(entry.getValue().get(0));
+					}
+				} else {
+					res.add(new ArrayList<>(Collections.singletonList(entry.getValue().get(0))));
+				}
+			} else {
+				if (res.size() > 0) {
+					ArrayList<List<JdComponent>> tempRes = new ArrayList<>(res);
+					res.clear();
+					for (List<JdComponent> tempRe : tempRes) {
+						for (JdComponent component : entry.getValue()) {
+							List<JdComponent> temp = new ArrayList<>(tempRe);
+							temp.add(component);
+							res.add(temp);
+						}
+					}
+				} else {
+					for (JdComponent component : entry.getValue()) {
+						res.add(new ArrayList<>(Collections.singletonList(component)));
+					}
+				}
+			}
+		}
+		return res;
+	}
+
+	@Override
+	public List<List<JdCategory>> groupCate(Map<Integer, List<JdCategory>> cateListMap) {
+		List<List<JdCategory>> res = new ArrayList<>();
+		for (Map.Entry<Integer, List<JdCategory>> entry : cateListMap.entrySet()) {
+			int times = entry.getValue().size();
+			if (times == 1) {
+				if (res.size() > 0) {
+					for (List<JdCategory> re : res) {
+						re.add(entry.getValue().get(0));
+					}
+				} else {
+					res.add(new ArrayList<>(Collections.singletonList(entry.getValue().get(0))));
+				}
+			} else {
+				if (res.size() > 0) {
+					ArrayList<List<JdCategory>> tempRes = new ArrayList<>(res);
+					res.clear();
+					for (List<JdCategory> tempRe : tempRes) {
+						for (JdCategory category : entry.getValue()) {
+							List<JdCategory> temp = new ArrayList<>(tempRe);
+							temp.add(category);
+							res.add(temp);
+						}
+					}
+				} else {
+					for (JdCategory category : entry.getValue()) {
+						res.add(new ArrayList<>(Collections.singletonList(category)));
+					}
+				}
+			}
+		}
+		return res;
+	}
+
+	private JdCategory getTopCate(JdCategory category) {
+		JdCategory cate = categoryMapper.selectByPrimaryKey(category.getParentId());
+		while (!cate.getParentId().equals(TOP_LEVEL)) {
+			cate = categoryMapper.selectByPrimaryKey(cate.getParentId());
+		}
+		return cate;
 	}
 }
