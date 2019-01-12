@@ -149,8 +149,11 @@ public class JdOrderServiceImpl implements JdOrderService {
 
 	//比较已选列表和必选列表 还需要去除互斥类型
 	private MandatoryResult compareMandatoryAndSelected(Integer productId, MandatoryResult mandatory, MandatoryResult selectedList) {
+		//去除已选的类型
 		mandatory.getCategories().removeAll(selectedList.getCategories());
-		mandatory.getComponents().retainAll(selectedList.getComponents());
+		//原来我为什么会写retain?? 这样的bug也太恐怖了吧
+		mandatory.getComponents().removeAll(selectedList.getComponents());
+		//去除互斥类型
 		mandatory.getCategories().removeAll(constraintService.getBanCategoryList(productId, selectedList.getComponents()));
 		mandatory.getComponents().removeAll(constraintService.getBanComponentList(productId, selectedList.getComponents()));
 		return mandatory;
