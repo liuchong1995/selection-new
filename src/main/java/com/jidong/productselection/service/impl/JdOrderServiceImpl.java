@@ -7,6 +7,7 @@ import com.jidong.productselection.dao.*;
 import com.jidong.productselection.dto.MandatoryResult;
 import com.jidong.productselection.dto.OrderDetail;
 import com.jidong.productselection.dto.OrderItem;
+import com.jidong.productselection.dto.ReConstraintResult;
 import com.jidong.productselection.entity.*;
 import com.jidong.productselection.enums.ComponentTypeEnum;
 import com.jidong.productselection.enums.InstallationEnum;
@@ -74,8 +75,10 @@ public class JdOrderServiceImpl implements JdOrderService {
 	private JdBracketMountingHeightMapper mountingHeightMapper;
 
 	@Autowired
-
 	private JdProductMapper productMapper;
+
+	@Autowired
+	private JdAdvanceMandatoryMapper advanceMandatoryMapper;
 
 	@Override
 	public PageInfo<JdOrder> findByPage(int page, int rows) {
@@ -161,6 +164,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 
 	//获取必选列表
 	private MandatoryResult getMandatoryItem(Integer productId, List<Integer> categoryIds, List<Integer> componentIds) {
+		//获取所有必选项，无重复
 		List<JdMandatory> mandatoryList = mandatoryMapper.findByPremiseProductId(productId);
 		mandatoryList.addAll(mandatoryMapper.findByPremiseCategoryIdIn(categoryIds));
 		mandatoryList.addAll(mandatoryMapper.findByPremiseComponentIdIn(componentIds));
@@ -168,10 +172,73 @@ public class JdOrderServiceImpl implements JdOrderService {
 		List<Integer> resultComponentIds = mandatoryList.stream().map(JdMandatory::getResultComponentId).collect(Collectors.toList());
 		List<JdCategory> resultCategories = resultCategoryIds.size() == 0 ? Collections.emptyList() : categoryMapper.findByCategoryIdIn(resultCategoryIds);
 		List<JdComponent> resultComponents = resultComponentIds.size() == 0 ? Collections.emptyList() : componentMapper.findByComponentIdIn(resultComponentIds);
+		MandatoryResult mandatoryResultOfAdvanceMandatory = getAdvanceMandatoryItem(productId, categoryIds, componentIds);
+
+		Set<JdCategory> categoryHashSet = new HashSet<>(resultCategories);
+		HashSet<JdComponent> componentHashSet = new HashSet<>(resultComponents);
+		categoryHashSet.addAll(mandatoryResultOfAdvanceMandatory.getCategories());
+		componentHashSet.addAll(mandatoryResultOfAdvanceMandatory.getComponents());
+
+
 		MandatoryResult mandatoryResult = new MandatoryResult();
+		mandatoryResult.setCategories(new ArrayList<>(categoryHashSet));
+		mandatoryResult.setComponents(new ArrayList<>(componentHashSet));
+		return mandatoryResult;
+	}
+
+	private MandatoryResult getAdvanceMandatoryItem(Integer productId, List<Integer> categoryIds, List<Integer> componentIds) {
+		List<JdAdvanceMandatory> advanceMandatoryList = advanceMandatoryMapper.findByProductId(productId);
+		List<JdAdvanceMandatory> result = new ArrayList<>();
+		MandatoryResult mandatoryResult = new MandatoryResult();
+		for (JdAdvanceMandatory advanceMandatory : advanceMandatoryList) {
+			if (isSatisfyAdvanceMandatory(advanceMandatory,categoryIds,componentIds)){
+				result.add(advanceMandatory);
+			}
+		}
+		Set<Integer> advanceMandatoryCateIds = new HashSet<>();
+		Set<Integer> advanceMandatoryCompIds = new HashSet<>();
+		for (JdAdvanceMandatory advanceMandatory : result) {
+			ReConstraintResult advanceRes = JSON.parseObject(advanceMandatory.getMandatory(), ReConstraintResult.class);
+			advanceMandatoryCateIds.addAll(advanceRes.getCategoryIds());
+			advanceMandatoryCompIds.addAll(advanceRes.getComponentIds());
+		}
+		List<JdCategory> resultCategories = advanceMandatoryCateIds.size() == 0 ? Collections.emptyList() : categoryMapper.findByCategoryIdIn(new ArrayList<>(advanceMandatoryCateIds));
+		List<JdComponent> resultComponents = advanceMandatoryCompIds.size() == 0 ? Collections.emptyList() : componentMapper.findByComponentIdIn(new ArrayList<>(advanceMandatoryCompIds));
 		mandatoryResult.setCategories(resultCategories);
 		mandatoryResult.setComponents(resultComponents);
 		return mandatoryResult;
+	}
+
+	private boolean isSatisfyAdvanceMandatory(JdAdvanceMandatory advanceMandatory, List<Integer> categoryIds, List<Integer> componentIds) {
+		List<Integer> existCate = JSON.parseArray(advanceMandatory.getExistCate(), Integer.class);
+		List<Integer> existComp = JSON.parseArray(advanceMandatory.getExistComp(), Integer.class);
+		List<Integer> nonExistentCate = JSON.parseArray(advanceMandatory.getNonExistentCate(), Integer.class);
+		List<Integer> nonExistentComp = JSON.parseArray(advanceMandatory.getNonExistentComp(), Integer.class);
+		if (existCate != null && existCate.size() > 0) {
+			if (!categoryIds.containsAll(existCate)) {
+				return false;
+			}
+		}
+		if (existComp != null && existComp.size() > 0) {
+			if (!componentIds.containsAll(existComp)) {
+				return false;
+			}
+		}
+		if (nonExistentCate != null && nonExistentCate.size() > 0) {
+			ArrayList<Integer> tempCateIds = new ArrayList<>(categoryIds);
+			tempCateIds.retainAll(nonExistentCate);
+			if (tempCateIds.size() != 0) {
+				return false;
+			}
+		}
+		if (nonExistentComp != null && nonExistentComp.size() > 0) {
+			ArrayList<Integer> tempCompIds = new ArrayList<>(componentIds);
+			tempCompIds.retainAll(componentIds);
+			if (tempCompIds.size() != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -192,16 +259,16 @@ public class JdOrderServiceImpl implements JdOrderService {
 		return orderMapper.insert(order);
 	}
 
-	private String generateOrderNumber(JdOrder order){
+	private String generateOrderNumber(JdOrder order) {
 		String serialNumber;
 		List<JdOrder> todayOrder = orderMapper.findOneDayOrder(new Date());
-		if (todayOrder == null || todayOrder.size() == 0){
+		if (todayOrder == null || todayOrder.size() == 0) {
 			serialNumber = "001";
 		} else {
 			List<JdOrder> orders = todayOrder.stream()
 					.filter(ele -> ele.getOrderNumber().contains(CROSS_BAR))
 					.collect(Collectors.toList());
-			if (orders.size() == 0){
+			if (orders.size() == 0) {
 				serialNumber = "001";
 			} else {
 				Optional<Integer> max = orders.stream()

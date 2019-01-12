@@ -1,7 +1,9 @@
 package com.jidong.productselection.dao;
-
 import com.jidong.productselection.entity.JdAdvanceMandatory;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * Created by Mybatis Generator 2019/01/12
@@ -19,4 +21,8 @@ public interface JdAdvanceMandatoryMapper {
     int updateByPrimaryKeySelective(JdAdvanceMandatory record);
 
     int updateByPrimaryKey(JdAdvanceMandatory record);
+
+    List<JdAdvanceMandatory> findByProductId(@Param("productId")Integer productId);
+
+
 }
