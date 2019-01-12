@@ -5,6 +5,7 @@ import com.jidong.productselection.entity.JdCategory;
 import com.jidong.productselection.entity.JdComponent;
 import com.jidong.productselection.entity.JdMutexDescribe;
 import com.jidong.productselection.entity.JdShelfConstraint;
+import com.jidong.productselection.request.AdvanceMandatoryConstraintRequest;
 import com.jidong.productselection.request.ConstraintRequest;
 import com.jidong.productselection.request.ConstraintSearchRequest;
 
@@ -36,6 +37,8 @@ public interface JdConstraintService {
 	void deleteConstraints(List<Integer> constraintIds);
 
 	int addShelfConstraint(JdShelfConstraint shelfConstraint);
+
+	int addAdvanceMandatoryConstraint(AdvanceMandatoryConstraintRequest advanceMandatoryConstraintRequest);
 
 	PageInfo<JdMutexDescribe> search(ConstraintSearchRequest searchRequest);
 

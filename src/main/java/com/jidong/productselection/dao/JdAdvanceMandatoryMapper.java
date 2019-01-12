@@ -24,5 +24,5 @@ public interface JdAdvanceMandatoryMapper {
 
     List<JdAdvanceMandatory> findByProductId(@Param("productId")Integer productId);
 
-
+    Integer findNestConstraintId();
 }

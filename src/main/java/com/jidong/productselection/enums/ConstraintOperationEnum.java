@@ -18,7 +18,9 @@ public enum ConstraintOperationEnum {
 
 	MANDATORY(4, "必选"),
 
-	SHELF_CONSTRAINT(5, "架子约束");
+	SHELF_CONSTRAINT(5, "架子约束"),
+
+	ADVANCE_MANDATORY(6, "高级必选约束");
 
 	private Integer code;
 

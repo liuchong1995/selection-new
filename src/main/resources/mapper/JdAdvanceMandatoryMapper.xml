@@ -166,4 +166,8 @@
     from jd_advance_mandatory
     where product_id=#{productId,jdbcType=INTEGER} and is_deleted = 0
   </select>
+
+  <select id="findNestConstraintId" resultType="java.lang.Integer">
+	select isnull(max(mandatory_id + 1), 1) as maxconstraintId
+	 from jd_advance_mandatory</select>
 </mapper>

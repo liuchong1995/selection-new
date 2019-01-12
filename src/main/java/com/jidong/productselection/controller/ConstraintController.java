@@ -3,6 +3,7 @@ package com.jidong.productselection.controller;
 import com.github.pagehelper.PageInfo;
 import com.jidong.productselection.entity.JdMutexDescribe;
 import com.jidong.productselection.entity.JdShelfConstraint;
+import com.jidong.productselection.request.AdvanceMandatoryConstraintRequest;
 import com.jidong.productselection.request.ConstraintRequest;
 import com.jidong.productselection.request.ConstraintSearchRequest;
 import com.jidong.productselection.response.BaseResponse;
@@ -27,7 +28,7 @@ public class ConstraintController {
 	private JdConstraintService constraintService;
 
 	@PostMapping("/")
-	public BaseResponse insertConstraint(@RequestBody ConstraintRequest constraintRequest){
+	public BaseResponse insertConstraint(@RequestBody ConstraintRequest constraintRequest) {
 		try {
 			return BaseResponse.success(constraintService.insertConstraint(constraintRequest));
 		} catch (Exception e) {
@@ -37,7 +38,7 @@ public class ConstraintController {
 	}
 
 	@DeleteMapping("/{constraintId}")
-	public BaseResponse deleteConstraint(@PathVariable("constraintId") Integer constraintId){
+	public BaseResponse deleteConstraint(@PathVariable("constraintId") Integer constraintId) {
 		try {
 			return BaseResponse.success(constraintService.deleteConstraint(constraintId));
 		} catch (Exception e) {
@@ -47,7 +48,7 @@ public class ConstraintController {
 	}
 
 	@PostMapping("/deleteAll")
-	public BaseResponse deleteConstraints(@RequestBody List<Integer> constraintIds){
+	public BaseResponse deleteConstraints(@RequestBody List<Integer> constraintIds) {
 		try {
 			constraintService.deleteConstraints(constraintIds);
 			return BaseResponse.success();
@@ -58,7 +59,7 @@ public class ConstraintController {
 	}
 
 	@PostMapping("/shelfConstraint")
-	public BaseResponse addShelfConstraints(@RequestBody JdShelfConstraint shelfConstraint){
+	public BaseResponse addShelfConstraints(@RequestBody JdShelfConstraint shelfConstraint) {
 		try {
 			int n = constraintService.addShelfConstraint(shelfConstraint);
 			return BaseResponse.success(n);
@@ -68,8 +69,19 @@ public class ConstraintController {
 		}
 	}
 
+	@PostMapping("/advanceMandatory")
+	public BaseResponse addAdvanceMandatory(@RequestBody AdvanceMandatoryConstraintRequest advanceMandatoryConstraintRequest) {
+		try {
+			int n = constraintService.addAdvanceMandatoryConstraint(advanceMandatoryConstraintRequest);
+			return BaseResponse.success(n);
+		} catch (Exception e) {
+			log.error("增加必选约束错误！" + e.getMessage(), e);
+			return BaseResponse.error("增加必选约束错误！");
+		}
+	}
+
 	@GetMapping("/maxGroupId")
-	public BaseResponse<Integer> getMaxGroupId(){
+	public BaseResponse<Integer> getMaxGroupId() {
 		try {
 			return BaseResponse.success(constraintService.getMaxGroupId());
 		} catch (Exception e) {
@@ -81,7 +93,7 @@ public class ConstraintController {
 	@PostMapping("/search")
 	public BaseResponse<PageInfo<JdMutexDescribe>> search(
 			@RequestBody ConstraintSearchRequest searchRequest
-	){
+	) {
 		try {
 			return BaseResponse.success(constraintService.search(searchRequest));
 		} catch (Exception e) {

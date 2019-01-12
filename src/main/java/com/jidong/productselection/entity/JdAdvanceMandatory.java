@@ -1,11 +1,13 @@
 package com.jidong.productselection.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
 * Created by Mybatis Generator 2019/01/12
 */
 @Data
+@Accessors(chain = true)
 public class JdAdvanceMandatory {
     private Integer mandatoryId;
 

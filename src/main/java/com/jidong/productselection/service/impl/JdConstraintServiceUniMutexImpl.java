@@ -8,6 +8,7 @@ import com.jidong.productselection.dto.*;
 import com.jidong.productselection.entity.*;
 import com.jidong.productselection.enums.ComponentTypeEnum;
 import com.jidong.productselection.enums.ConstraintOperationEnum;
+import com.jidong.productselection.request.AdvanceMandatoryConstraintRequest;
 import com.jidong.productselection.request.ConstraintRequest;
 import com.jidong.productselection.request.ConstraintSearchRequest;
 import com.jidong.productselection.service.JdCategoryService;
@@ -72,6 +73,9 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 
 	@Autowired
 	private ConstraintUtil constraintUtil;
+
+	@Autowired
+	private JdAdvanceMandatoryMapper advanceMandatoryMapper;
 
 	@Override
 	public String refactorMenuTree(Integer productId, List<JdComponent> selectedList) {
@@ -164,6 +168,8 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 			mandatoryMapper.updateIsDeletedBYMandatoryId(reallyStorageIds.get(0));
 		} else if (mutexDescribe.getConstraintType().equals(ConstraintOperationEnum.SHELF_CONSTRAINT.getCode())) {
 			shelfConstraintMapper.deleteByPrimaryKey(reallyStorageIds.get(0));
+		} else if (mutexDescribe.getConstraintType().equals(ConstraintOperationEnum.ADVANCE_MANDATORY.getCode())) {
+			advanceMandatoryMapper.deleteByPrimaryKey(reallyStorageIds.get(0));
 		}
 		return mutexDescribeMapper.deleteByDescribeId(constraintId);
 	}
@@ -220,8 +226,8 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 		List<Integer> shelfAndInstallation = new ArrayList<>();
 		shelfAndInstallation.add(product.getShelfId());
 		shelfAndInstallation.add(product.getInstallationId());
-		productMapper.selectByPrimaryKey(shelfConstraint.getProductId());
 		mutexDescribe.setDescribeId(mutexDescribeMapper.findNextDescribeId())
+				.setRegenerateRequest(JSON.toJSONString(shelfConstraint))
 				.setIsDeleted(false)
 				.setGroupName(SHELF_CONSTRAINT)
 				.setConstraintType(ConstraintOperationEnum.SHELF_CONSTRAINT.getCode())
@@ -233,6 +239,77 @@ public class JdConstraintServiceUniMutexImpl implements JdConstraintService {
 				.setComponents(JSON.toJSONString(Collections.emptyList()));
 		mutexDescribeMapper.insert(mutexDescribe);
 		return shelfConstraintMapper.insert(shelfConstraint);
+	}
+
+
+	private static final String EXISTENT = "存在: ";
+
+	private static final String NON_EXISTENT = "不存在: ";
+
+	private static final String ADVANCE_MANDATORY = "必选: ";
+
+	@Override
+	@Transactional
+	public int addAdvanceMandatoryConstraint(AdvanceMandatoryConstraintRequest advanceMandatoryConstraintRequest) {
+		JdAdvanceMandatory advanceMandatory = new JdAdvanceMandatory();
+		advanceMandatory.setMandatoryId(advanceMandatoryMapper.findNestConstraintId())
+				.setIsDeleted(false)
+				.setProductId(advanceMandatoryConstraintRequest.getProductId())
+				.setExistCate(JSON.toJSONString(advanceMandatoryConstraintRequest.getExitCate().stream().map(JdCategory::getCategoryId).collect(Collectors.toList())))
+				.setExistComp(JSON.toJSONString(advanceMandatoryConstraintRequest.getExitComp().stream().map(JdComponent::getComponentId).collect(Collectors.toList())))
+				.setNonExistentCate(JSON.toJSONString(advanceMandatoryConstraintRequest.getNonExistentCate().stream().map(JdCategory::getCategoryId).collect(Collectors.toList())))
+				.setNonExistentComp(JSON.toJSONString(advanceMandatoryConstraintRequest.getNonExistentComp().stream().map(JdComponent::getComponentId).collect(Collectors.toList())));
+
+		List<Integer> resCate = advanceMandatoryConstraintRequest.getResCate().stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
+		List<Integer> resComp = advanceMandatoryConstraintRequest.getResComp().stream().map(JdComponent::getComponentId).collect(Collectors.toList());
+		ReConstraintResult constraintResult = new ReConstraintResult(resCate, resComp);
+		advanceMandatory.setMandatory(JSON.toJSONString(constraintResult));
+		advanceMandatoryMapper.insert(advanceMandatory);
+		//拼凑描述
+		StringBuilder constraintDescribe = new StringBuilder();
+		constraintDescribe.append(advanceMandatoryConstraintRequest.getConstraintDesc()).append(SPACE).append(EXISTENT);
+		for (JdCategory category : advanceMandatoryConstraintRequest.getExitCate()) {
+			constraintDescribe.append(category.getCategoryName()).append(SPACE);
+		}
+		for (JdComponent component : advanceMandatoryConstraintRequest.getExitComp()) {
+			constraintDescribe.append(component.getComponentModelNumber()).append(SPACE);
+		}
+		constraintDescribe.append(NON_EXISTENT);
+		for (JdCategory category : advanceMandatoryConstraintRequest.getNonExistentCate()) {
+			constraintDescribe.append(category.getCategoryName()).append(SPACE);
+		}
+		for (JdComponent component : advanceMandatoryConstraintRequest.getNonExistentComp()) {
+			constraintDescribe.append(component.getComponentModelNumber()).append(SPACE);
+		}
+		constraintDescribe.append(ADVANCE_MANDATORY);
+		for (JdCategory category : advanceMandatoryConstraintRequest.getResCate()) {
+			constraintDescribe.append(category.getCategoryName()).append(SPACE);
+		}
+		for (JdComponent component : advanceMandatoryConstraintRequest.getResComp()) {
+			constraintDescribe.append(component.getComponentModelNumber()).append(SPACE);
+		}
+		JdMutexDescribe mutexDescribe = new JdMutexDescribe();
+		List<Integer> cateIds = new ArrayList<>();
+		List<Integer> compIds = new ArrayList<>();
+		ReConstraintResult reConstraintResult = JSON.parseObject(advanceMandatory.getMandatory(), ReConstraintResult.class);
+		cateIds.addAll(JSON.parseArray(advanceMandatory.getExistCate(),Integer.class));
+		cateIds.addAll(JSON.parseArray(advanceMandatory.getNonExistentCate(),Integer.class));
+		cateIds.addAll(reConstraintResult.getCategoryIds());
+		compIds.addAll(JSON.parseArray(advanceMandatory.getExistComp(),Integer.class));
+		compIds.addAll(JSON.parseArray(advanceMandatory.getNonExistentComp(),Integer.class));
+		compIds.addAll(reConstraintResult.getComponentIds());
+		mutexDescribe.setDescribeId(mutexDescribeMapper.findNextDescribeId())
+				.setIsDeleted(false)
+				.setRegenerateRequest(JSON.toJSONString(advanceMandatoryConstraintRequest))
+				.setCategories(JSON.toJSONString(cateIds))
+				.setComponents(JSON.toJSONString(compIds))
+				.setConstraintDesc(constraintDescribe.toString())
+				.setConstraintType(ConstraintOperationEnum.ADVANCE_MANDATORY.getCode())
+				.setGroupId(advanceMandatoryConstraintRequest.getGroupId())
+				.setGroupName(advanceMandatoryConstraintRequest.getGroupName())
+				.setProductId(advanceMandatoryConstraintRequest.getProductId())
+				.setMutexIds(JSON.toJSONString(Collections.singletonList(advanceMandatory.getMandatoryId())));
+		return mutexDescribeMapper.insert(mutexDescribe);
 	}
 
 	@Override
