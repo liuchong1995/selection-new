@@ -413,6 +413,9 @@ public class JdOrderServiceImpl implements JdOrderService {
 		Map<Integer, String> orderShortNumberMap = new TreeMap<>(Comparator.naturalOrder());
 		for (JdComponent component : modelNumberRequest.getSelectedList()) {
 			Integer order = categoryMapper.selectByPrimaryKey(component.getFirstCategoryId()).getCategoryOrder();
+			if (order == null){
+				continue;
+			}
 			String shortNumber = "";
 			boolean isShelf = component.getFirstCategoryId().equals(product.getShelfId());
 			boolean isInstallation = component.getFirstCategoryId().equals(product.getInstallationId());
