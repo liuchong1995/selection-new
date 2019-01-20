@@ -1,8 +1,60 @@
-spring:
-  # 环境 dev|prod
-  profiles:
-    active: dev
+# 公共配置环境
+PRODUCT_IMG_REQUEST: /PS/**
+PRODUCT_IMG_REQUEST_PRE: /PS/
 ps-connect-cad:
   exchange: jidong.ps2cad
   pstocad-queue: orderNum
   cadtops-queue: cadResult
+spring:
+  # 环境 dev|prd....
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver #可以 根据url 自行判断
+    #连接池配置
+    druid:
+      initial-size: 8
+      min-idle: 8
+      max-active: 128
+      test-on-borrow: true
+      test-on-return: true
+      test-While-Idle: true
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      pool-prepared-statements: true
+      async-close-connection-enable: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall,config
+  rabbitmq:
+    publisher-confirms: true
+    publisher-returns: true
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  configuration:
+    callSettersOnNulls: true
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 3000
+logging:
+  level:
+    com:
+      jidong:
+        productselection:
+          dao: debug
+pagehelper:
+  helperDialect: sqlserver
+  reasonable: true
+  supportMethodsArguments: true
+  pageSizeZero: true
+  params: count=countSql
