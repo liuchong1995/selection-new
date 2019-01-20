@@ -8,7 +8,7 @@ ps-connect-cad:
 spring:
   # 环境 dev|prd....
   profiles:
-    active: dev
+    active: mac
   datasource:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver #可以 根据url 自行判断
     #连接池配置
