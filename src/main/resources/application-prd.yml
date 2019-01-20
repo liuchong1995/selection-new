@@ -1,70 +1,14 @@
+PRODUCT_IMG_LOCATION: file:D:/ProductSelection/
+PRODUCT_IMG_UPLOAD: D:/ProductSelection/
 server:
   port: 8888
 spring:
   datasource:
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;Databasename=kyokutoh
+    url: jdbc:sqlserver://localhost:1433;DatabaseName=kyokutoh
     username: sa
     password: JDong@2018
-    druid:
-      initial-size: 10
-      max-active: 200
-      min-idle: 10
-      max-wait: 60000
-      pool-prepared-statements: true
-      max-pool-prepared-statement-per-connection-size: 20
-      time-between-evictionruns-millis: 60000
-    min-evictable-idle-time-millis: 300000
-    test-while-idle: true
-    test-on-borrow: false
-    test-on-return: false
-    stat-view-servlet:
-      enabled: true
-      url-pattern: /druid/*
-    filter:
-      stat:
-        log-slow-sql: true
-        slow-sql-millis: 1000
-        merge-sql: false
-      wall:
-        config:
-          multi-statement-allow: true
   rabbitmq:
     host: localhost
     port: 5672
     username: admin
     password: 1234
-    publisher-confirms: true
-    publisher-returns: true
-    listener:
-      direct:
-        acknowledge-mode: manual
-      simple:
-        acknowledge-mode: manual
-  servlet:
-    multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
-mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
-  configuration:
-    callSettersOnNulls: true
-    map-underscore-to-camel-case: true
-    default-fetch-size: 100
-    default-statement-timeout: 3000
-logging:
-  level:
-    com:
-      jidong:
-        productselection:
-          dao: debug
-pagehelper:
-  helperDialect: sqlserver
-  reasonable: true
-  supportMethodsArguments: true
-  pageSizeZero: true
-  params: count=countSql
-PRODUCT_IMG_LOCATION: file:D:/ProductSelection/
-PRODUCT_IMG_REQUEST: /PS/**
-PRODUCT_IMG_REQUEST_PRE: /PS/
-PRODUCT_IMG_UPLOAD: D:/ProductSelection/
