@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([["6XQj"],{"6XQj":function(e,t,n){"use strict";n.r(t);var l={name:"selecting",components:{SelectDetail:n("CAGU").a}},s=n("KHd+"),i=Object(s.a)(l,function(){var e=this.$createElement;return(this._self._c||e)("select-detail",{attrs:{"is-edit":!1}})},[],!1,null,null,null);i.options.__file="selecting.vue";t.default=i.exports}}]);
