@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
-
 /**
  * @Author: LiuChong
  * @Date: 2018/12/20 15:44
@@ -33,7 +31,7 @@ public class OrderSenderTest {
 	@Test
 	public void sendOrder() {
 		try {
-			sender.sendOrder(orderMapper.selectByPrimaryKey(25),exchangeName,queueName);
+			sender.sendOrder(orderMapper.selectByPrimaryKey(39),exchangeName,queueName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

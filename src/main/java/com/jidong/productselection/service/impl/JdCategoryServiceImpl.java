@@ -269,7 +269,7 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 	}
 
 	/**
-	 * 按照最后一级分类分成不同的分组
+	 * 把组件按照最后一级分类分成不同的分组
 	 *
 	 * @param jdComponents
 	 * @return
@@ -288,6 +288,11 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		return partitionCompMap;
 	}
 
+	/**
+	 * 把类别按照顶级分类分成不同的分组
+	 * @param jdCategories
+	 * @return
+	 */
 	@Override
 	public Map<Integer, List<JdCategory>> partitionCate(List<JdCategory> jdCategories) {
 		Map<Integer, List<JdCategory>> partitionCateMap = new HashMap<>();
@@ -307,6 +312,13 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		return partitionCateMap;
 	}
 
+	/**
+	 * 此方法和groupCate方法为互斥时分组所用
+	 * eg:类型 AB C 部件 d 互斥于 类型 E 部件 fg
+	 * 则变成 ACE BCE df dg
+	 * @param compListMap
+	 * @return
+	 */
 	@Override
 	public List<List<JdComponent>> groupComp(Map<Integer, List<JdComponent>> compListMap) {
 		List<List<JdComponent>> res = new ArrayList<>();
