@@ -37,11 +37,7 @@ public class DownLoadController {
 
         JdOrder order = orderMapper.selectByPrimaryKey(orderId);
         //设置文件路径
-        String path = PREVIEW_LOCATION + File.separator + order.getOrderNumber() + File.separator + order.getProductModel() + PREVIEW_SUFFIX;
-        boolean b = path.equals("/Users/liuchong/AutoDresserPRJ/GZJD01-20190124-001/CDKRRB-F10FS10KC322-CVSP1JB15.EASM");
-        System.out.println(b);
-        System.out.println(path);
-        System.out.println("/Users/liuchong/AutoDresserPRJ/GZJD01-20190124-001/CDKRRB-F10FS10KC322-CVSP1JB15.EASM");
+        String path = PREVIEW_LOCATION + "/" + order.getOrderNumber() + "/" + order.getProductModel() + PREVIEW_SUFFIX;
         File file = new File(path);
 
         // 如果文件名存在，则进行下载
