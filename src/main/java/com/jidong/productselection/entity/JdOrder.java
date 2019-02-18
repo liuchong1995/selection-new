@@ -1,12 +1,13 @@
 package com.jidong.productselection.entity;
 
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
-* Created by Mybatis Generator 2018/12/15
-*/
+ * Created by Mybatis Generator 2019/02/18
+ */
 @Data
 public class JdOrder implements Serializable {
     private Integer orderId;
@@ -42,4 +43,15 @@ public class JdOrder implements Serializable {
     private String shelfCode;
 
     private String mainCompCode;
+
+    private Integer status;
+
+    private String message;
+
+    public JdOrder() {
+    }
+
+    protected boolean canEqual(Object other) {
+        return other instanceof com.jidong.productselection.entity.JdOrder;
+    }
 }

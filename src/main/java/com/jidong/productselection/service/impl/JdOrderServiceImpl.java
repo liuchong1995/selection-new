@@ -11,6 +11,7 @@ import com.jidong.productselection.dto.ReConstraintResult;
 import com.jidong.productselection.entity.*;
 import com.jidong.productselection.enums.ComponentTypeEnum;
 import com.jidong.productselection.enums.InstallationEnum;
+import com.jidong.productselection.enums.OrderStatusEnum;
 import com.jidong.productselection.enums.VoltageEnum;
 import com.jidong.productselection.request.GenerateOrderModelNumberRequest;
 import com.jidong.productselection.request.OrderSearchRequest;
@@ -19,8 +20,10 @@ import com.jidong.productselection.service.JdConstraintService;
 import com.jidong.productselection.service.JdOrderService;
 import com.jidong.productselection.util.DateUtil;
 import com.jidong.productselection.util.NumberUtil;
+import com.jidong.productselection.util.OrderSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -43,6 +46,12 @@ public class JdOrderServiceImpl implements JdOrderService {
 	private static final String CROSS_BAR = "-";
 
 	private static final String ORDER_PREFIX = "GZJD";
+
+	@Value("${ps-connect-cad.exchange}")
+	private String exchangeName;
+
+	@Value("${ps-connect-cad.pstocad-queue}")
+	private String queueName;
 
 	@Autowired
 	private JdOrderMapper orderMapper;
@@ -79,6 +88,9 @@ public class JdOrderServiceImpl implements JdOrderService {
 
 	@Autowired
 	private JdAdvanceMandatoryMapper advanceMandatoryMapper;
+
+	@Autowired
+	private OrderSender orderSender;
 
 	@Override
 	public PageInfo<JdOrder> findByPage(int page, int rows) {
@@ -148,6 +160,42 @@ public class JdOrderServiceImpl implements JdOrderService {
 		}
 		orderDetail.setComponents(components);
 		return orderDetail;
+	}
+
+	@Override
+	@Transactional
+	public void commitPreview(Integer orderId) {
+		try {
+			orderSender.sendOrder(orderMapper.selectByPrimaryKey(orderId),exchangeName,queueName);
+			log.info("发送消息成功！！！");
+		} catch (Exception e) {
+			log.error("发送消息失败！！！");
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public int changeOrderStatus(OrderStatusEnum orderStatusEnum, Integer orderId) {
+		return orderMapper.updateStatusByOrderId(orderStatusEnum.getCode(),orderId);
+	}
+
+	@Override
+	public void waitForFinish(Integer orderId) {
+	    int times = 0;
+		while(true){
+			try {
+				if(orderMapper.selectByPrimaryKey(orderId).getStatus().equals(OrderStatusEnum.GENERATE_SUCCESS.getCode())){//决定返回条件，可自定义。如数据库发生变化返回等
+					return;
+				}
+				// 两个小时还未装配完成则放弃装配
+				if (++times > 1440){
+				    return;
+                }
+				Thread.sleep(5000);//防止循序太频繁
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	//比较已选列表和必选列表 还需要去除互斥类型

@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jidong.productselection.dto.MandatoryResult;
 import com.jidong.productselection.dto.OrderDetail;
 import com.jidong.productselection.entity.JdOrder;
+import com.jidong.productselection.enums.OrderStatusEnum;
 import com.jidong.productselection.request.GenerateOrderModelNumberRequest;
 import com.jidong.productselection.request.OrderSearchRequest;
 
@@ -30,4 +31,10 @@ public interface JdOrderService {
 	MandatoryResult getMandatoryResult(JdOrder order);
 
 	OrderDetail getOrderDetail(Integer orderId,Boolean changeShelfCode);
+
+    void commitPreview(Integer orderId);
+
+    int changeOrderStatus(OrderStatusEnum orderStatusEnum, Integer orderId);
+
+	void waitForFinish(Integer orderId);
 }

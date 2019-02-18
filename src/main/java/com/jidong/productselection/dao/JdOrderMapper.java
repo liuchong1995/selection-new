@@ -9,29 +9,32 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Mybatis Generator 2018/12/15
+ * Created by Mybatis Generator 2019/02/18
  */
 @Mapper
 public interface JdOrderMapper {
-	int deleteByPrimaryKey(Integer orderId);
+    int deleteByPrimaryKey(Integer orderId);
 
-	int insert(JdOrder record);
+    int insert(JdOrder record);
 
-	int insertSelective(JdOrder record);
+    int insertSelective(JdOrder record);
 
-	JdOrder selectByPrimaryKey(Integer orderId);
+    JdOrder selectByPrimaryKey(Integer orderId);
 
-	int updateByPrimaryKeySelective(JdOrder record);
+    int updateByPrimaryKeySelective(JdOrder record);
 
-	int updateByPrimaryKey(JdOrder record);
+    int updateByPrimaryKey(JdOrder record);
 
-	List<JdOrder> findByIsDeleted(@Param("isDeleted") Boolean isDeleted);
+    List<JdOrder> findByIsDeleted(@Param("isDeleted") Boolean isDeleted);
 
-	List<JdOrder> findByOrderSearchRequest(@Param("searchRequest") OrderSearchRequest searchRequest);
+    List<JdOrder> findByOrderSearchRequest(@Param("searchRequest") OrderSearchRequest searchRequest);
 
-	int deleteByOrderId(@Param("orderId") Integer orderId);
+    int deleteByOrderId(@Param("orderId") Integer orderId);
 
-	Integer findNextOrderId();
+    Integer findNextOrderId();
 
-	List<JdOrder> findOneDayOrder(@Param("createTime")Date createTime);
+    List<JdOrder> findOneDayOrder(@Param("createTime") Date createTime);
+
+    int updateStatusByOrderId(@Param("updatedStatus")Integer updatedStatus,@Param("orderId")Integer orderId);
+
 }
