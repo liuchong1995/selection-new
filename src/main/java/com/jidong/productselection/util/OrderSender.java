@@ -1,8 +1,6 @@
 package com.jidong.productselection.util;
 
-import com.alibaba.fastjson.JSON;
 import com.jidong.productselection.entity.JdOrder;
-import com.jidong.productselection.enums.OrderStatusEnum;
 import com.jidong.productselection.service.JdOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -30,8 +28,8 @@ public class OrderSender {
 		String messageId = correlationData.getId();
 		if(ack){
 			//如果confirm返回成功 则进行更新
-			log.info("更新订单状态为已提交...");
-			orderService.changeOrderStatus(OrderStatusEnum.COMMITTED, Integer.valueOf(messageId));
+			log.info("信息发送成功...");
+			//orderService.changeOrderStatus(OrderStatusEnum.COMMITTED, Integer.valueOf(messageId));
 		} else {
 			//失败则进行具体的后续操作:重试 或者补偿等手段
 			log.info("异常处理...");
@@ -43,6 +41,6 @@ public class OrderSender {
 		rabbitTemplate.setConfirmCallback(confirmCallback);
 		//消息唯一ID
 		CorrelationData correlationData = new CorrelationData(order.getOrderId().toString());
-		rabbitTemplate.convertAndSend(exchange, routingKey, JSON.toJSONString(order.getOrderNumber()), correlationData);
+		rabbitTemplate.convertAndSend(exchange, routingKey, order.getOrderNumber(), correlationData);
 	}
 }

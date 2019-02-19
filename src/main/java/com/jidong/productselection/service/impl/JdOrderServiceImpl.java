@@ -168,6 +168,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 		try {
 			orderSender.sendOrder(orderMapper.selectByPrimaryKey(orderId),exchangeName,queueName);
 			log.info("发送消息成功！！！");
+			changeOrderStatus(OrderStatusEnum.COMMITTED, orderId);
 		} catch (Exception e) {
 			log.error("发送消息失败！！！");
 			e.printStackTrace();
@@ -304,6 +305,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 		order.setCreateTime(now);
 		order.setUpdateTime(now);
 		order.setIsDeleted(false);
+		order.setStatus(OrderStatusEnum.UNCOMMITTED.getCode());
 		return orderMapper.insert(order);
 	}
 
