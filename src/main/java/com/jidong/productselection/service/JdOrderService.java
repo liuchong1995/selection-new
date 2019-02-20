@@ -36,5 +36,7 @@ public interface JdOrderService {
 
     int changeOrderStatus(OrderStatusEnum orderStatusEnum, Integer orderId);
 
+	int changeOrderMsg(String msg, Integer orderId);
+
 	void waitForFinish(Integer orderId);
 }

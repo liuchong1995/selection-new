@@ -1,7 +1,9 @@
 package com.jidong.productselection.util;
 
 import com.alibaba.fastjson.JSON;
-import com.jidong.productselection.response.BaseResponse;
+import com.jidong.productselection.dto.CADResult;
+import com.jidong.productselection.enums.OrderStatusEnum;
+import com.jidong.productselection.service.JdOrderService;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.*;
@@ -11,13 +13,17 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Objects;
 
 @Component
 public class CADResultReceiver {
 
 	@Autowired
 	private SimpMessagingTemplate messageTemplate;
-	
+
+	@Autowired
+	JdOrderService orderService;
+
 	@RabbitListener(bindings = @QueueBinding(
 			value = @Queue(value = "${ps-connect-cad.cadtops-queue}",durable = "true"),
 			exchange = @Exchange(name="${ps-connect-cad.exchange}",durable = "true",type = "topic"),
@@ -25,14 +31,22 @@ public class CADResultReceiver {
 	)
 	)
 	@RabbitHandler
-	public void process(String CADResult, Channel channel, Message message) throws IOException {
+	public void process(Channel channel, Message message) throws IOException {
 		byte[] body = message.getBody();
-		System.out.println("Receiver收到:" + new String(body) +"   收到时间: "+new Date());
+		String msg = new String(body);
+		System.out.println("Receiver收到:" + msg +"   收到时间: "+new Date());
 		try {
 			//告诉服务器收到这条消息 已经被我消费了 可以在队列删掉 这样以后就不会再发了 否则消息服务器以为这条消息没处理掉 后续还会在发
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
 			System.out.println("receiver success");
-			messageTemplate.convertAndSend("/topic/cadres", JSON.toJSONString(BaseResponse.success()));
+			CADResult cadResult = JSON.parseObject(msg, CADResult.class);
+			if (Objects.equals(cadResult.getCode(), OrderStatusEnum.GENERATING.getCode())){
+				orderService.changeOrderStatus(OrderStatusEnum.GENERATING,cadResult.getOrderId());
+			} else if (Objects.equals(cadResult.getCode(), OrderStatusEnum.GENERATE_SUCCESS.getCode())){
+				orderService.changeOrderStatus(OrderStatusEnum.GENERATE_SUCCESS,cadResult.getOrderId());
+			}
+			orderService.changeOrderMsg(cadResult.getMessage(), cadResult.getOrderId());
+			messageTemplate.convertAndSend("/topic/cadres", msg);
 			System.out.println("推送消息给前端完成");
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -37,4 +37,7 @@ public interface JdOrderMapper {
 
     int updateStatusByOrderId(@Param("updatedStatus")Integer updatedStatus,@Param("orderId")Integer orderId);
 
+    int updateMessageByOrderId(@Param("updatedMessage")String updatedMessage,@Param("orderId")Integer orderId);
+
+
 }

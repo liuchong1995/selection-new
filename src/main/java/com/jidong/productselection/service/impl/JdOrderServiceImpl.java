@@ -176,8 +176,14 @@ public class JdOrderServiceImpl implements JdOrderService {
 	}
 
 	@Override
+	@Transactional
 	public int changeOrderStatus(OrderStatusEnum orderStatusEnum, Integer orderId) {
 		return orderMapper.updateStatusByOrderId(orderStatusEnum.getCode(),orderId);
+	}
+
+	@Override
+	public int changeOrderMsg(String msg, Integer orderId) {
+		return orderMapper.updateMessageByOrderId(msg,orderId);
 	}
 
 	@Override

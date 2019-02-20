@@ -16,7 +16,11 @@ public enum OrderStatusEnum {
 
     COMMITTED(1, "已提交"),
 
-    GENERATE_SUCCESS(2, "生成成功");
+    GENERATE_SUCCESS(2, "生成完成"),
+
+    GENERATING(3, "正在生成"),
+
+    GENERATE_FAILURE(4, "生成失败");
 
     private static final Map<Integer, OrderStatusEnum> code2enumMap = new HashMap<Integer, OrderStatusEnum>();
 
