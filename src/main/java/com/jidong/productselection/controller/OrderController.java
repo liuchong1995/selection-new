@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @Author: LiuChong
  * @Date: 2018/12/6 22:42
@@ -130,6 +132,17 @@ public class OrderController {
         } catch (Exception e) {
             log.error("提交预览请求错误！" + e.getMessage(), e);
             return BaseResponse.error("提交预览请求错误！");
+        }
+    }
+
+    @PostMapping("/deleteList")
+    public BaseResponse deleteList(@RequestBody List<Integer> orderIds) {
+        try {
+            orderService.deleteList(orderIds);
+            return BaseResponse.success();
+        } catch (Exception e) {
+            log.error("批量删除错误！" + e.getMessage(), e);
+            return BaseResponse.error("批量删除错误！");
         }
     }
 }

@@ -31,6 +31,8 @@ public interface JdOrderMapper {
 
     int deleteByOrderId(@Param("orderId") Integer orderId);
 
+    int deleteByOrderIdIn(@Param("orderIdList")List<Integer> orderIdList);
+
     Integer findNextOrderId();
 
     List<JdOrder> findOneDayOrder(@Param("createTime") Date createTime);

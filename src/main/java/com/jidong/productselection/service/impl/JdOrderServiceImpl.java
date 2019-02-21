@@ -205,6 +205,11 @@ public class JdOrderServiceImpl implements JdOrderService {
 		}
 	}
 
+	@Override
+	public int deleteList(List<Integer> orderIds) {
+		return orderMapper.deleteByOrderIdIn(orderIds);
+	}
+
 	//比较已选列表和必选列表 还需要去除互斥类型
 	private MandatoryResult compareMandatoryAndSelected(Integer productId, MandatoryResult mandatory, MandatoryResult selectedList) {
 		//去除已选的类型

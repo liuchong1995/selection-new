@@ -1,5 +1,6 @@
 package com.jidong.productselection.dto;
 
+import com.jidong.productselection.entity.JdOrder;
 import lombok.Data;
 
 /**
@@ -15,4 +16,6 @@ public class CADResult {
 	private String message;
 
 	private Integer orderId;
+
+	private JdOrder order;
 }

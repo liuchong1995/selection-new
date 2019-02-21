@@ -1,6 +1,7 @@
 package com.jidong.productselection.util;
 
 import com.alibaba.fastjson.JSON;
+import com.jidong.productselection.dao.JdOrderMapper;
 import com.jidong.productselection.dto.CADResult;
 import com.jidong.productselection.enums.OrderStatusEnum;
 import com.jidong.productselection.service.JdOrderService;
@@ -24,6 +25,9 @@ public class CADResultReceiver {
 	@Autowired
 	JdOrderService orderService;
 
+	@Autowired
+	JdOrderMapper orderMapper;
+
 	@RabbitListener(bindings = @QueueBinding(
 			value = @Queue(value = "${ps-connect-cad.cadtops-queue}",durable = "true"),
 			exchange = @Exchange(name="${ps-connect-cad.exchange}",durable = "true",type = "topic"),
@@ -46,7 +50,8 @@ public class CADResultReceiver {
 				orderService.changeOrderStatus(OrderStatusEnum.GENERATE_SUCCESS,cadResult.getOrderId());
 			}
 			orderService.changeOrderMsg(cadResult.getMessage(), cadResult.getOrderId());
-			messageTemplate.convertAndSend("/topic/cadres", msg);
+			cadResult.setOrder(orderMapper.selectByPrimaryKey(cadResult.getOrderId()));
+			messageTemplate.convertAndSend("/topic/cadres", JSON.toJSONString(cadResult));
 			System.out.println("推送消息给前端完成");
 		} catch (IOException e) {
 			e.printStackTrace();
