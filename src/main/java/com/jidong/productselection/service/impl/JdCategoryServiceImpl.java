@@ -193,7 +193,7 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		return categoryMapper.deleteByPrimaryKey(category.getCategoryId());
 	}
 
-	//妥协了，人肉递归好了
+	//递归
 	@Override
 	public List<JdCategory> getAllLeafCategory(Integer categoryId) {
 		List<JdCategory> allLeafCategory = new ArrayList<>();
