@@ -200,26 +200,35 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		JdCategory category = categoryMapper.selectByPrimaryKey(categoryId);
 		if (category.getIsLeaf()) {
 			allLeafCategory.add(category);
-		} else {
-			for (JdCategory subCategory : categoryMapper.findByParentId(categoryId)) {
-				if (subCategory.getIsLeaf()) {
-					allLeafCategory.add(subCategory);
-				} else {
-					for (JdCategory subSubCategory : categoryMapper.findByParentId(subCategory.getCategoryId())) {
-						if (subSubCategory.getIsLeaf()) {
-							allLeafCategory.add(subSubCategory);
-						} else {
-							for (JdCategory subSubSubCategory : categoryMapper.findByParentId(subSubCategory.getCategoryId())) {
-								if (subSubSubCategory.getIsLeaf()) {
-									allLeafCategory.add(subSubCategory);
-								}
-							}
-						}
-					}
-				}
-			}
+			return allLeafCategory;
+		}
+		List<JdCategory> childrenCate = categoryMapper.findByParentId(categoryId);
+		for (JdCategory cate : childrenCate) {
+			allLeafCategory.addAll(getAllLeafCategory(cate.getCategoryId()));
 		}
 		return allLeafCategory;
+//		if (category.getIsLeaf()) {
+//			allLeafCategory.add(category);
+//		} else {
+//			for (JdCategory subCategory : categoryMapper.findByParentId(categoryId)) {
+//				if (subCategory.getIsLeaf()) {
+//					allLeafCategory.add(subCategory);
+//				} else {
+//					for (JdCategory subSubCategory : categoryMapper.findByParentId(subCategory.getCategoryId())) {
+//						if (subSubCategory.getIsLeaf()) {
+//							allLeafCategory.add(subSubCategory);
+//						} else {
+//							for (JdCategory subSubSubCategory : categoryMapper.findByParentId(subSubCategory.getCategoryId())) {
+//								if (subSubSubCategory.getIsLeaf()) {
+//									allLeafCategory.add(subSubCategory);
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return allLeafCategory;
 	}
 
 	@Override

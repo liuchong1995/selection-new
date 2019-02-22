@@ -6,6 +6,7 @@ import com.jidong.productselection.dto.CADResult;
 import com.jidong.productselection.enums.OrderStatusEnum;
 import com.jidong.productselection.service.JdOrderService;
 import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Component
+@Slf4j
 public class CADResultReceiver {
 
 	@Autowired
@@ -48,11 +50,14 @@ public class CADResultReceiver {
 				orderService.changeOrderStatus(OrderStatusEnum.GENERATING,cadResult.getOrderId());
 			} else if (Objects.equals(cadResult.getCode(), OrderStatusEnum.GENERATE_SUCCESS.getCode())){
 				orderService.changeOrderStatus(OrderStatusEnum.GENERATE_SUCCESS,cadResult.getOrderId());
+			} else if (Objects.equals(cadResult.getCode(), OrderStatusEnum.GENERATE_FAILURE.getCode())){
+				orderService.changeOrderStatus(OrderStatusEnum.GENERATE_FAILURE,cadResult.getOrderId());
 			}
 			orderService.changeOrderMsg(cadResult.getMessage(), cadResult.getOrderId());
 			cadResult.setOrder(orderMapper.selectByPrimaryKey(cadResult.getOrderId()));
 			messageTemplate.convertAndSend("/topic/cadres", JSON.toJSONString(cadResult));
-			System.out.println("推送消息给前端完成");
+			log.info(JSON.toJSONString(cadResult));
+			log.info("推送消息给前端完成");
 		} catch (IOException e) {
 			e.printStackTrace();
 			//丢弃这条消息
