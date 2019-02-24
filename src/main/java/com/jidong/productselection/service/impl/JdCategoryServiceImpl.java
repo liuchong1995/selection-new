@@ -14,6 +14,7 @@ import com.jidong.productselection.util.ConstraintUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -193,7 +194,7 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		return categoryMapper.deleteByPrimaryKey(category.getCategoryId());
 	}
 
-	//递归
+	//递归 返回所有最后一层分类
 	@Override
 	public List<JdCategory> getAllLeafCategory(Integer categoryId) {
 		List<JdCategory> allLeafCategory = new ArrayList<>();
@@ -249,30 +250,60 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 	 */
 	@Override
 	public List<JdCategory> getAllSubCates(Integer categoryId) {
+		List<JdCategory> res = getAllSubCate(categoryId);
 		JdCategory currCategory = categoryMapper.selectByPrimaryKey(categoryId);
-		if (currCategory.getIsLeaf()) {
-			return Collections.emptyList();
-		}
+		res.remove(currCategory);
+		return res;
+//		if (Objects.isNull(currCategory)){
+//			return res;
+//		}
+//		if (Objects.nonNull(currCategory)) {
+//			res.add(currCategory);
+//			return res;
+//		}
+//		List<JdCategory> childrenCate = categoryMapper.findByParentId(currCategory.getCategoryId());
+//
+//		List<JdCategory> secondList = categoryMapper.findByParentId(currCategory.getCategoryId());
+//		if (secondList != null && secondList.size() > 0) {
+//			res.addAll(secondList);
+//			for (JdCategory secondCategory : secondList) {
+//				if (!secondCategory.getIsLeaf()) {
+//					List<JdCategory> thirdList = categoryMapper.findByParentId(secondCategory.getCategoryId());
+//					if (thirdList != null && thirdList.size() > 0) {
+//						res.addAll(thirdList);
+//						for (JdCategory thirdCategory : thirdList) {
+//							if (!thirdCategory.getIsLeaf()) {
+//								List<JdCategory> forthList = categoryMapper.findByParentId(thirdCategory.getCategoryId());
+//								if (forthList != null && forthList.size() > 0) {
+//									res.addAll(forthList);
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return res;
+	}
+
+	/**
+	 * 查找包含当前分类 以及当前分类的所有子分类 递归
+	 * @param categoryId
+	 * @return
+	 */
+	private List<JdCategory> getAllSubCate(Integer categoryId) {
 		List<JdCategory> res = new ArrayList<>();
-		List<JdCategory> secondList = categoryMapper.findByParentId(currCategory.getCategoryId());
-		if (secondList != null && secondList.size() > 0) {
-			res.addAll(secondList);
-			for (JdCategory secondCategory : secondList) {
-				if (!secondCategory.getIsLeaf()) {
-					List<JdCategory> thirdList = categoryMapper.findByParentId(secondCategory.getCategoryId());
-					if (thirdList != null && thirdList.size() > 0) {
-						res.addAll(thirdList);
-						for (JdCategory thirdCategory : thirdList) {
-							if (!thirdCategory.getIsLeaf()) {
-								List<JdCategory> forthList = categoryMapper.findByParentId(thirdCategory.getCategoryId());
-								if (forthList != null && forthList.size() > 0) {
-									res.addAll(forthList);
-								}
-							}
-						}
-					}
+		JdCategory currCategory = categoryMapper.selectByPrimaryKey(categoryId);
+		res.add(currCategory);
+		if (!currCategory.getIsLeaf()){
+			List<JdCategory> childrenCate = categoryMapper.findByParentId(currCategory.getCategoryId());
+			if (!CollectionUtils.isEmpty(childrenCate)){
+				for (JdCategory cate : childrenCate) {
+					res.addAll(getAllSubCate(cate.getCategoryId()));
 				}
 			}
+		} else {
+			return res;
 		}
 		return res;
 	}
