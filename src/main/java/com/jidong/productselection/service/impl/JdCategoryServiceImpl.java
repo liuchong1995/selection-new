@@ -6,9 +6,7 @@ import com.jidong.productselection.dao.JdMutexDescribeMapper;
 import com.jidong.productselection.dao.JdProductMapper;
 import com.jidong.productselection.entity.JdCategory;
 import com.jidong.productselection.entity.JdComponent;
-import com.jidong.productselection.entity.JdMutexDescribe;
 import com.jidong.productselection.entity.JdProduct;
-import com.jidong.productselection.enums.ConstraintOperationEnum;
 import com.jidong.productselection.request.CategoryAddRequest;
 import com.jidong.productselection.service.JdCategoryService;
 import com.jidong.productselection.service.JdConstraintService;
@@ -175,9 +173,9 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 			productMapper.updateByPrimaryKeySelective(product);
 		}
 		int num = categoryMapper.insert(category);
-		List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(productId, ConstraintOperationEnum.ONLY_BE_USED.getCode());
-		List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(category, ele)).collect(Collectors.toList());
-		constraintService.regenerate(needRegenerateList);
+		//List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(productId, ConstraintOperationEnum.ONLY_BE_USED.getCode());
+		//List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(category, ele)).collect(Collectors.toList());
+		//constraintService.regenerate(needRegenerateList);
 		return num;
 	}
 

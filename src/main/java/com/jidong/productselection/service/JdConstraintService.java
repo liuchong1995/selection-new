@@ -18,6 +18,7 @@ import java.util.List;
  */
 public interface JdConstraintService {
 
+	@Deprecated
 	String refactorMenuTree(Integer productId, List<JdComponent> selectedList);
 
 	List<JdCategory> refactorNewMenuTree(Integer productId, List<JdComponent> selectedList);

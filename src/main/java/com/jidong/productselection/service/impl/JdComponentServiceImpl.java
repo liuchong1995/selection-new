@@ -10,10 +10,8 @@ import com.jidong.productselection.dao.JdProductMapper;
 import com.jidong.productselection.dto.ComponentDetail;
 import com.jidong.productselection.entity.JdCategory;
 import com.jidong.productselection.entity.JdComponent;
-import com.jidong.productselection.entity.JdMutexDescribe;
 import com.jidong.productselection.entity.JdProduct;
 import com.jidong.productselection.enums.ComponentTypeEnum;
-import com.jidong.productselection.enums.ConstraintOperationEnum;
 import com.jidong.productselection.request.ComponentAddRequest;
 import com.jidong.productselection.request.ComponentSearchRequest;
 import com.jidong.productselection.service.JdCategoryService;
@@ -171,9 +169,9 @@ public class JdComponentServiceImpl implements JdComponentService {
 		component.setCreator(componentAddRequest.getCreator());
 		component.setIsDeleted(false);
 		int num =  componentMapper.insertSelective(component);
-		List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(componentAddRequest.getProductId(), ConstraintOperationEnum.ONLY_BE_USED.getCode());
-		List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(component, ele)).collect(Collectors.toList());
-		constraintService.regenerate(needRegenerateList);
+		//List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(componentAddRequest.getProductId(), ConstraintOperationEnum.ONLY_BE_USED.getCode());
+		//List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(component, ele)).collect(Collectors.toList());
+		//constraintService.regenerate(needRegenerateList);
 		return num;
 	}
 
@@ -210,9 +208,9 @@ public class JdComponentServiceImpl implements JdComponentService {
 		component.setUpdateTime(now);
 
 		int num = componentMapper.updateByPrimaryKey(component);
-		List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(componentAddRequest.getProductId(), ConstraintOperationEnum.ONLY_BE_USED.getCode());
-		List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(component, ele)).collect(Collectors.toList());
-		constraintService.regenerate(needRegenerateList);
+		//List<JdMutexDescribe> onlyUsedConstraints = mutexDescribeMapper.findByProductIdAndConstraintType(componentAddRequest.getProductId(), ConstraintOperationEnum.ONLY_BE_USED.getCode());
+		//List<JdMutexDescribe> needRegenerateList = onlyUsedConstraints.stream().filter(ele -> constraintUtil.needReGenerate(component, ele)).collect(Collectors.toList());
+		//constraintService.regenerate(needRegenerateList);
 		return num;
 	}
 
