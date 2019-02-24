@@ -46,6 +46,7 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 	private JdConstraintService constraintService;
 
 	@Override
+	@Deprecated
 	public String getMenuTree(Integer prdId) {
 		List<Map<Object, Object>> menuTree = categoryMapper.getMenuTree(prdId);
 		//menuTree.stream().filter(map -> (boolean) map.get(IS_SHOW_RANK)).collect(Collectors.toList());
@@ -65,6 +66,7 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 
 
 	@Override
+	@Deprecated
 	public String getTreeList(List<Map<Object, Object>> resultMap) {
 
 		Map<String, List<Map<Object, Object>>> temp = new HashMap<String, List<Map<Object, Object>>>();

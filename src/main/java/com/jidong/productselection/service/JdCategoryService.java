@@ -14,8 +14,10 @@ import java.util.Map;
  */
 public interface JdCategoryService {
 
+	@Deprecated
 	String getMenuTree(Integer prdId);
 
+	@Deprecated
 	String getTreeList(List<Map<Object, Object>> resultMap);
 
 	List<Integer> excludeAllCategory(JdCategory category);
