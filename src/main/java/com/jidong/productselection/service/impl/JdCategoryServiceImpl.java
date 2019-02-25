@@ -299,6 +299,7 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 
 	/**
 	 * 把类别按照顶级分类分成不同的分组
+	 *
 	 * @param jdCategories
 	 * @return
 	 */
@@ -325,76 +326,114 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 	 * 此方法和groupCate方法为互斥时分组所用
 	 * eg:类型 AB C 部件 d 互斥于 类型 E 部件 fg
 	 * 则变成 ACE BCE df dg
+	 * 改成递归吧!!!
+	 *
 	 * @param compListMap
 	 * @return
 	 */
+	private List<List<JdComponent>> groupCompRes = new ArrayList<>();
 	@Override
 	public List<List<JdComponent>> groupComp(Map<Integer, List<JdComponent>> compListMap) {
-		List<List<JdComponent>> res = new ArrayList<>();
-		for (Map.Entry<Integer, List<JdComponent>> entry : compListMap.entrySet()) {
-			int times = entry.getValue().size();
-			if (times == 1) {
-				if (res.size() > 0) {
-					for (List<JdComponent> re : res) {
-						re.add(entry.getValue().get(0));
-					}
-				} else {
-					res.add(new ArrayList<>(Collections.singletonList(entry.getValue().get(0))));
-				}
-			} else {
-				if (res.size() > 0) {
-					ArrayList<List<JdComponent>> tempRes = new ArrayList<>(res);
-					res.clear();
-					for (List<JdComponent> tempRe : tempRes) {
-						for (JdComponent component : entry.getValue()) {
-							List<JdComponent> temp = new ArrayList<>(tempRe);
-							temp.add(component);
-							res.add(temp);
-						}
-					}
-				} else {
-					for (JdComponent component : entry.getValue()) {
-						res.add(new ArrayList<>(Collections.singletonList(component)));
-					}
-				}
-			}
+		List<List<JdComponent>> temp = new ArrayList<>();
+		groupCompRes.clear();
+		compListMap.forEach((key, compList) -> temp.add(compList));
+		if (!temp.isEmpty()){
+			groupCompRecursion(temp,0,new ArrayList<>());
 		}
-		return res;
+//		for (Map.Entry<Integer, List<JdComponent>> entry : compListMap.entrySet()) {
+//			int times = entry.getValue().size();
+//			if (times == 1) {
+//				if (res.size() > 0) {
+//					for (List<JdComponent> re : res) {
+//						re.add(entry.getValue().get(0));
+//					}
+//				} else {
+//					res.add(new ArrayList<>(Collections.singletonList(entry.getValue().get(0))));
+//				}
+//			} else {
+//				if (res.size() > 0) {
+//					ArrayList<List<JdComponent>> tempRes = new ArrayList<>(res);
+//					res.clear();
+//					for (List<JdComponent> tempRe : tempRes) {
+//						for (JdComponent component : entry.getValue()) {
+//							List<JdComponent> temp = new ArrayList<>(tempRe);
+//							temp.add(component);
+//							res.add(temp);
+//						}
+//					}
+//				} else {
+//					for (JdComponent component : entry.getValue()) {
+//						res.add(new ArrayList<>(Collections.singletonList(component)));
+//					}
+//				}
+//			}
+//		}
+		return groupCompRes;
 	}
 
+	private void groupCompRecursion(List<List<JdComponent>> compListList, int index, List<JdComponent> tempList) {
+		if (compListList.size() == index){
+			groupCompRes.add(tempList);
+			return;
+		}
+		for (JdComponent comp : compListList.get(index)) {
+			tempList.add(comp);
+			groupCompRecursion(compListList,index + 1,tempList);
+		}
+	}
+
+	private List<List<JdCategory>> groupCateRes = new ArrayList<>();
 	@Override
 	public List<List<JdCategory>> groupCate(Map<Integer, List<JdCategory>> cateListMap) {
-		List<List<JdCategory>> res = new ArrayList<>();
-		for (Map.Entry<Integer, List<JdCategory>> entry : cateListMap.entrySet()) {
-			int times = entry.getValue().size();
-			if (times == 1) {
-				if (res.size() > 0) {
-					for (List<JdCategory> re : res) {
-						re.add(entry.getValue().get(0));
-					}
-				} else {
-					res.add(new ArrayList<>(Collections.singletonList(entry.getValue().get(0))));
-				}
-			} else {
-				if (res.size() > 0) {
-					ArrayList<List<JdCategory>> tempRes = new ArrayList<>(res);
-					res.clear();
-					for (List<JdCategory> tempRe : tempRes) {
-						for (JdCategory category : entry.getValue()) {
-							List<JdCategory> temp = new ArrayList<>(tempRe);
-							temp.add(category);
-							res.add(temp);
-						}
-					}
-				} else {
-					for (JdCategory category : entry.getValue()) {
-						res.add(new ArrayList<>(Collections.singletonList(category)));
-					}
-				}
-			}
+		List<List<JdCategory>> temp = new ArrayList<>();
+		groupCateRes.clear();
+		cateListMap.forEach((key, compList) -> temp.add(compList));
+		if (!temp.isEmpty()){
+			groupCateRecursion(temp,0,new ArrayList<>());
 		}
-		return res;
+
+//		for (Map.Entry<Integer, List<JdCategory>> entry : cateListMap.entrySet()) {
+//			int times = entry.getValue().size();
+//			if (times == 1) {
+//				if (res.size() > 0) {
+//					for (List<JdCategory> re : res) {
+//						re.add(entry.getValue().get(0));
+//					}
+//				} else {
+//					res.add(new ArrayList<>(Collections.singletonList(entry.getValue().get(0))));
+//				}
+//			} else {
+//				if (res.size() > 0) {
+//					ArrayList<List<JdCategory>> tempRes = new ArrayList<>(res);
+//					res.clear();
+//					for (List<JdCategory> tempRe : tempRes) {
+//						for (JdCategory category : entry.getValue()) {
+//							List<JdCategory> temp = new ArrayList<>(tempRe);
+//							temp.add(category);
+//							res.add(temp);
+//						}
+//					}
+//				} else {
+//					for (JdCategory category : entry.getValue()) {
+//						res.add(new ArrayList<>(Collections.singletonList(category)));
+//					}
+//				}
+//			}
+//		}
+		return groupCateRes;
 	}
+
+	private void groupCateRecursion(List<List<JdCategory>> cateListList, int index, List<JdCategory> tempList) {
+		if (cateListList.size() == index){
+			groupCateRes.add(tempList);
+			return;
+		}
+		for (JdCategory cate : cateListList.get(index)) {
+			tempList.add(cate);
+			groupCateRecursion(cateListList,index + 1,tempList);
+		}
+	}
+
 
 	private JdCategory getTopCate(JdCategory category) {
 		JdCategory cate = categoryMapper.selectByPrimaryKey(category.getParentId());
