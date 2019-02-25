@@ -408,8 +408,9 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 			return;
 		}
 		for (JdComponent comp : compListList.get(index)) {
-			tempList.add(comp);
-			groupCompRecursion(compListList,index + 1,tempList);
+			List<JdComponent> tempTempList = new ArrayList<>(tempList);
+			tempTempList.add(comp);
+			groupCompRecursion(compListList,index + 1,tempTempList);
 		}
 	}
 
@@ -460,8 +461,9 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 			return;
 		}
 		for (JdCategory cate : cateListList.get(index)) {
-			tempList.add(cate);
-			groupCateRecursion(cateListList,index + 1,tempList);
+			List<JdCategory> tempTempList = new ArrayList<>(tempList);
+			tempTempList.add(cate);
+			groupCateRecursion(cateListList,index + 1,tempTempList);
 		}
 	}
 
