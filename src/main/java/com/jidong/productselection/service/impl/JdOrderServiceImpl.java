@@ -364,8 +364,9 @@ public class JdOrderServiceImpl implements JdOrderService {
 			for (JdShelfDistinction shelfDistinction : shelfDistinctionList) {
 				List<JdComponent> selectedList = componentMapper.findByComponentIdIn(componentIds);
 				List<Integer> tempIdList = constraintService.getCategories(selectedList).stream().map(JdCategory::getCategoryId).collect(Collectors.toList());
-				tempIdList.retainAll(JSON.parseArray(shelfDistinction.getCategoryIds(), Integer.class));
-				if (tempIdList.size() > mostMatch) {
+				List<Integer> suffixCondition = JSON.parseArray(shelfDistinction.getCategoryIds(), Integer.class);
+				tempIdList.retainAll(suffixCondition);
+				if (tempIdList.size() == suffixCondition.size() && tempIdList.size() > mostMatch) {
 					mostMatch = tempIdList.size();
 					mostMatchShelfDistinction = shelfDistinction;
 				}
