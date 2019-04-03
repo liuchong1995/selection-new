@@ -16,5 +16,7 @@ public class ShelfHeight {
 
 	private Integer minMountedHeight;
 
+	private Integer maxMountedHeight;
+
 	private List<Integer> inst;
 }
