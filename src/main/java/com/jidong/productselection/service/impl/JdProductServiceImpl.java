@@ -64,6 +64,9 @@ public class JdProductServiceImpl implements JdProductService {
 	public Integer addProduct(JdProduct product) {
 		Integer productId = productMapper.findNextProductId();
 		product.setProductId(productId);
+		product.setHasInstallation(true);
+		product.setHasMountedheight(true);
+		product.setHasShelfheight(true);
 		return productMapper.insert(product);
 	}
 }

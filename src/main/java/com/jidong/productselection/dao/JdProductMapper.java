@@ -1,13 +1,12 @@
 package com.jidong.productselection.dao;
-import org.apache.ibatis.annotations.Param;
 
 import com.jidong.productselection.entity.JdProduct;
-import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;import java.util.List;
 
 /**
- * Created by Mybatis Generator 2018/12/14
+ * @Author: LiuChong
+ * @Date: 2019/4/3 13:01
+ * @Description:
  */
 @Mapper
 public interface JdProductMapper {

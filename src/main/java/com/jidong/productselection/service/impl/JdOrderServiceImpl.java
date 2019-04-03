@@ -394,16 +394,20 @@ public class JdOrderServiceImpl implements JdOrderService {
 			List<JdComponent> shelf = componentList.stream().filter(comp -> comp.getFirstCategoryId().equals(shelfCategoryId)).collect(Collectors.toList());
 			if (!CollectionUtils.isEmpty(shelf)) {
 				//获取安装方式
-				JdComponent installation = componentList.stream().filter(comp -> comp.getFirstCategoryId().equals(installationId)).collect(Collectors.toList()).get(0);
-				if (installation.getComponentShortNumber().equals(InstallationEnum.PAPERBACK.getCode())) {
-					shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(installation.getComponentShortNumber()).append(order.getShelfHeight()).append(CROSS_BAR);
-				} else {
-					shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(order.getShelfHeight()).append(CROSS_BAR);
+				if (product.getHasInstallation()) {
+					JdComponent installation = componentList.stream().filter(comp -> comp.getFirstCategoryId().equals(installationId)).collect(Collectors.toList()).get(0);
+					if (installation.getComponentShortNumber().equals(InstallationEnum.PAPERBACK.getCode())) {
+						shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(installation.getComponentShortNumber()).append(order.getShelfHeight()).append(CROSS_BAR);
+					} else {
+						shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(order.getShelfHeight()).append(CROSS_BAR);
+					}
+					shelfCode.append(installation.getComponentShortNumber());
 				}
-				shelfCode.append(installation.getComponentShortNumber());
-				Integer mountHeight = order.getMountHeight();
-				String heightCode = mountingHeightMapper.findByHeight(mountHeight).getHeightCode();
-				shelfCode.append(heightCode);
+				if (product.getHasMountedheight()) {
+					Integer mountHeight = order.getMountHeight();
+					String heightCode = mountingHeightMapper.findByHeight(mountHeight).getHeightCode();
+					shelfCode.append(heightCode);
+				}
 				if (StringUtils.hasText(controllerBoxInstallationCode) || StringUtils.hasText(shelfTail)) {
 					shelfCode.append(CROSS_BAR).append(controllerBoxInstallationCode).append(shelfTail);
 				}
@@ -483,7 +487,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 			boolean isInstallation = component.getFirstCategoryId().equals(product.getInstallationId());
 			if (isShelf) {
 				shortNumber = component.getComponentShortNumber().trim()
-						+ handleShelfHeight(modelNumberRequest.getShelfHeight());
+						+ (product.getHasShelfheight() ? handleShelfHeight(modelNumberRequest.getShelfHeight()) : "");
 			} else if (isInstallation) {
 				if (modelNumberRequest.getMountHeight() != null) {
 					shortNumber = component.getComponentShortNumber().trim()
