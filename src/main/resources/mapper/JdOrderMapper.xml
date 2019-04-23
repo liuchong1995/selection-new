@@ -305,6 +305,9 @@
         <if test="searchRequest.productId != null">
             AND product_id = #{searchRequest.productId}
         </if>
+        <if test="searchRequest.productModel != null and searchRequest.productModel != ''">
+          AND product_model like concat('%',#{searchRequest.productModel},'%')
+        </if>
         <if test="searchRequest.costumer != null and searchRequest.costumer != ''">
             AND customer like concat('%',#{searchRequest.costumer},'%')
         </if>

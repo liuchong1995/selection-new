@@ -103,6 +103,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 	@Override
 	public PageInfo<JdOrder> searchByPage(OrderSearchRequest orderSearchRequest) {
 		PageHelper.startPage(orderSearchRequest.getPage(), orderSearchRequest.getRows());
+		orderSearchRequest.setProductModel(StringUtils.hasText(orderSearchRequest.getProductModel()) ? orderSearchRequest.getProductModel().trim() : "");
 		List<JdOrder> orders = orderMapper.findByOrderSearchRequest(orderSearchRequest);
 		PageInfo<JdOrder> orderPageInfo = new PageInfo<>(orders);
 		return orderPageInfo;

@@ -17,6 +17,8 @@ public class OrderSearchRequest {
 
 	private Date endDate;
 
+	private String productModel;
+
 	private String costumer;
 
 	private String endUser;
