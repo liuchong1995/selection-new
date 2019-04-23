@@ -396,10 +396,11 @@ public class JdOrderServiceImpl implements JdOrderService {
 				//获取安装方式
 				if (product.getHasInstallation()) {
 					JdComponent installation = componentList.stream().filter(comp -> comp.getFirstCategoryId().equals(installationId)).collect(Collectors.toList()).get(0);
+					Boolean hasShelfheight = product.getHasShelfheight();
 					if (installation.getComponentShortNumber().equals(InstallationEnum.PAPERBACK.getCode())) {
-						shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(installation.getComponentShortNumber()).append(order.getShelfHeight()).append(CROSS_BAR);
+						shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(installation.getComponentShortNumber()).append(hasShelfheight ? order.getShelfHeight() : "").append(CROSS_BAR);
 					} else {
-						shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(order.getShelfHeight()).append(CROSS_BAR);
+						shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(hasShelfheight ? order.getShelfHeight() : "").append(hasShelfheight ? CROSS_BAR : "");
 					}
 					shelfCode.append(installation.getComponentShortNumber());
 				}
