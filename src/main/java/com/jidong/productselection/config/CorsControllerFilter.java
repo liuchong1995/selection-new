@@ -33,7 +33,7 @@ public class CorsControllerFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		// 跨域白名单
-		String[] whiteList = {"http://localhost:9888", "http://192.168.1.99"};
+		String[] whiteList = {"http://localhost","http://localhost:9888", "http://192.168.1.99"};
 		String myOrigin = request.getHeader("origin");
 		boolean isValid = false;
 		for( String ip : whiteList ) {
