@@ -14,6 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 
@@ -39,7 +40,7 @@ public class CADResultReceiver {
 	@RabbitHandler
 	public void process(Channel channel, Message message) throws IOException {
 		byte[] body = message.getBody();
-		String msg = new String(body);
+		String msg = new String(body, StandardCharsets.UTF_8);
 		System.out.println("Receiver收到:" + msg +"   收到时间: "+new Date());
 		try {
 			//告诉服务器收到这条消息 已经被我消费了 可以在队列删掉 这样以后就不会再发了 否则消息服务器以为这条消息没处理掉 后续还会在发

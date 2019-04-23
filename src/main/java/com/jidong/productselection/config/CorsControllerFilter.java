@@ -32,7 +32,17 @@ public class CorsControllerFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
-		response.addHeader("Access-Control-Allow-Origin", "http://localhost:9888");
+		// 跨域白名单
+		String[] whiteList = {"http://localhost:9888", "http://192.168.1.99"};
+		String myOrigin = request.getHeader("origin");
+		boolean isValid = false;
+		for( String ip : whiteList ) {
+			if( myOrigin != null && myOrigin.equals(ip) ){
+				isValid = true;
+				break;
+			}
+		}
+		response.setHeader("Access-Control-Allow-Origin", isValid ? myOrigin : "null");
 		response.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE ,PUT");
 		response.addHeader("Access-Control-Max-Age", "30");
 		response.addHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since,"
