@@ -509,19 +509,7 @@ public class JdOrderServiceImpl implements JdOrderService {
 	}
 
 	private String handleShelfHeight(Integer shelfHeight) {
-		int remainder = shelfHeight % 100;
-		String result = "";
-		if (remainder == 0) {
-			int quotient = shelfHeight / 100;
-			if (quotient >= 10) {
-				result = Integer.valueOf(quotient).toString();
-			} else {
-				result = "0" + Integer.valueOf(quotient).toString();
-			}
-		} else {
-			result = shelfHeight >= 1000 ? (Integer.valueOf(shelfHeight / 10)).toString() : shelfHeight.toString();
-		}
-		return result;
+		return mountingHeightMapper.findByHeight(shelfHeight).getHeightCode();
 	}
 
 	private String addCrossBar(Map<Integer, String> orderShortNumberMap, List<Integer> subsectionNumbs) {
