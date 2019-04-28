@@ -98,7 +98,7 @@ public class UserController {
 	@PostMapping("/checkOldPassword")
 	public BaseResponse checkOldPassword(@RequestParam String username, @RequestParam String password){
 		try {
-			return BaseResponse.success(service.checkOldPassword(username,password));
+			return BaseResponse.success(service.checkOldPassword(username,password) ?  200 : 500);
 		} catch (Exception e) {
 			log.error("校验密码错误！" + e.getMessage(), e);
 			return BaseResponse.error("校验密码错误！");
