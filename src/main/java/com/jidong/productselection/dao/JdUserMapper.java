@@ -34,6 +34,6 @@ public interface JdUserMapper {
 
 	int updateRolesBYUserId(@Param("updatedRoles") String updatedRoles, @Param("userId") Integer userId);
 
-
+	int updatePasswordByUsername(@Param("updatedPassword")String updatedPassword,@Param("username")String username);
 
 }

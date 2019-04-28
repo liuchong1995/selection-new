@@ -24,6 +24,8 @@ public interface JdUserService {
 
 	int updatePassword(int userId, String newPassword);
 
+	int updatePassword(String username, String newPassword);
+
 	int updateRole(int userId, String newRoles);
 
 	int deleteUser(Integer userId);
@@ -31,4 +33,6 @@ public interface JdUserService {
 	JdUser getCurrentUser(String username);
 
     List<JdUser> getAllUserName();
+
+	Boolean checkOldPassword(String username, String password);
 }

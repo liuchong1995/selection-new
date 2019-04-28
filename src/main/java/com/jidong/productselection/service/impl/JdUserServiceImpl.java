@@ -73,6 +73,14 @@ public class JdUserServiceImpl implements JdUserService {
 
 	@Override
 	@Transactional
+	public int updatePassword(String username, String newPassword) {
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String password = passwordEncoder.encode(newPassword);
+		return userMapper.updatePasswordByUsername(password,username);
+	}
+
+	@Override
+	@Transactional
 	public int updateRole(int userId, String newRoles) {
 		return userMapper.updateRolesBYUserId(newRoles,userId);
 	}
@@ -96,4 +104,11 @@ public class JdUserServiceImpl implements JdUserService {
         userList.forEach(user -> user.setPassword(null));
         return userList;
     }
+
+	@Override
+	public Boolean checkOldPassword(String username, String password) {
+		JdUser user = userMapper.findByUsername(username);
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		return passwordEncoder.matches(password,user.getPassword());
+	}
 }
