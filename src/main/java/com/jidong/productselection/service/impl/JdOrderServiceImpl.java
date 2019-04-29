@@ -404,6 +404,9 @@ public class JdOrderServiceImpl implements JdOrderService {
 						shelfCode.append(shelf.get(0).getComponentModelNumber()).append(CROSS_BAR).append(hasShelfheight ? order.getShelfHeight() : "").append(hasShelfheight ? CROSS_BAR : "");
 					}
 					shelfCode.append(installation.getComponentShortNumber());
+				} else {
+					Boolean hasShelfheight = product.getHasShelfheight();
+					shelfCode.append(shelf.get(0).getComponentModelNumber()).append(hasShelfheight ? CROSS_BAR + order.getShelfHeight() : "");
 				}
 				if (product.getHasMountedheight()) {
 					Integer mountHeight = order.getMountHeight();
