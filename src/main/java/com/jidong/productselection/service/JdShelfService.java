@@ -22,4 +22,8 @@ public interface JdShelfService {
 	List<JdShelfConstraint> getAllShelfConstraint(Integer productId);
 
 	List<JdComponent> getAllInstallation(Integer productId);
+
+	List<ShelfHeight> getConstraint(Integer shelfId);
+
+	int insertOrUpdate(String heights,Integer bracketId);
 }

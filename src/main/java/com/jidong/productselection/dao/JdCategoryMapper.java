@@ -43,4 +43,6 @@ public interface JdCategoryMapper {
 	List<JdCategory> selectCateChildren(@Param("parentId") Integer parentId);
 
 	List<JdCategory> selectAllCateChildren(@Param("parentId") Integer parentId);
+
+	int updateCategoryNameByCategoryId(@Param("categoryName") String categoryName, @Param("categoryId")Integer categoryId);
 }

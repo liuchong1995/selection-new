@@ -32,6 +32,8 @@ public interface JdCategoryService {
 
 	int delete(JdCategory category);
 
+	int updateCategoryName(String newName, Integer cateId);
+
 	List<JdCategory> getAllLeafCategory(Integer categoryIds);
 
 	List<JdCategory> getNewMenuTree(Integer prdId,Integer parentId);

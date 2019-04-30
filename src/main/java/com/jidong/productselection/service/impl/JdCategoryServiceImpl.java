@@ -194,6 +194,11 @@ public class JdCategoryServiceImpl implements JdCategoryService {
 		return categoryMapper.deleteByPrimaryKey(category.getCategoryId());
 	}
 
+	@Override
+	public int updateCategoryName(String newName, Integer cateId) {
+		return categoryMapper.updateCategoryNameByCategoryId(newName,cateId);
+	}
+
 	//递归 返回所有最后一层分类
 	@Override
 	public List<JdCategory> getAllLeafCategory(Integer categoryId) {

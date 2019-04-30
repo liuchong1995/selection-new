@@ -107,4 +107,15 @@ public class CategoryController {
 			return BaseResponse.error("删除类型错误！");
 		}
 	}
+
+	@PostMapping("/rename")
+	public BaseResponse rename(@RequestParam String categoryName,@RequestParam Integer categoryId){
+		try {
+			categoryService.updateCategoryName(categoryName,categoryId);
+			return BaseResponse.success();
+		}catch (Exception e) {
+			log.error("更改类型名称错误！", e);
+			return BaseResponse.error("更改类型名称错误！");
+		}
+	}
 }

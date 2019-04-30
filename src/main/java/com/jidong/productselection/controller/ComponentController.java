@@ -198,4 +198,16 @@ public class ComponentController {
 			return BaseResponse.error("获取部件列表错误！");
 		}
 	}
+
+	@GetMapping("/getAllShelf/{productId}")
+	public BaseResponse<List<JdComponent>> getAllShelf(@PathVariable("productId") Integer productId) {
+		try {
+			List<JdComponent> components = componentService.getAllShelf(productId);
+			return BaseResponse.success(components);
+		} catch (Exception e) {
+			log.error("获取架子列表错误！" + e.getMessage(), e);
+			return BaseResponse.error("获取架子列表错误！");
+		}
+	}
+
 }

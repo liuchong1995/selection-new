@@ -280,4 +280,14 @@ public class JdComponentServiceImpl implements JdComponentService {
 		return componentMapper.findByProductIdAndcomponentModelNumberOrComponentShortNumber(request.getProductId(),request.getComponentModelNumber(),request.getComponentShortNumber());
 	}
 
+	@Override
+	public List<JdComponent> getAllShelf(Integer productId) {
+		JdProduct product = productMapper.selectByPrimaryKey(productId);
+		if (product.getShelfId() != null) {
+			return findByCategory(product.getShelfId());
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
 }

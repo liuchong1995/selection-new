@@ -7,6 +7,7 @@ import com.jidong.productselection.entity.*;
 import com.jidong.productselection.service.JdShelfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,5 +68,24 @@ public class JdShelfServiceImpl implements JdShelfService {
 	public List<JdComponent> getAllInstallation(Integer productId) {
 		JdProduct product = productMapper.selectByPrimaryKey(productId);
 		return product.getInstallationId() != null ? componentMapper.findByFirstCategoryId(product.getInstallationId()) : Collections.emptyList();
+	}
+
+	@Override
+	public List<ShelfHeight> getConstraint(Integer shelfId) {
+		return JSON.parseArray(bracketHeightMapper.findByBracketId(shelfId).getHeights(),ShelfHeight.class);
+	}
+
+	@Transactional
+	@Override
+	public int insertOrUpdate(String heights, Integer bracketId) {
+		JdBracketHeight bracketHeight = bracketHeightMapper.findByBracketId(bracketId);
+		if (bracketHeight != null) {
+			return bracketHeightMapper.updateHeightsByBracketId(heights,bracketId);
+		}
+		JdBracketHeight newRecord = new JdBracketHeight();
+		newRecord.setHeights(heights);
+		newRecord.setBracketId(bracketId);
+		newRecord.setBracketHeightId(bracketHeightMapper.findNextbracketHeightId());
+		return bracketHeightMapper.insert(newRecord);
 	}
 }

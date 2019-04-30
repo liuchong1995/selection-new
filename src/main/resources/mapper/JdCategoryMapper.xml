@@ -291,4 +291,9 @@
 		where parent_id=#{parentId,jdbcType=INTEGER} and is_deleted = 0
 	</select>
 
+    <update id="updateCategoryNameByCategoryId">
+        update jd_category
+        set category_name = #{categoryName,jdbcType=VARCHAR}
+        where category_id = #{categoryId,jdbcType=INTEGER}
+    </update>
 </mapper>

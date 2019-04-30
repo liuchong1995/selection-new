@@ -16,5 +16,11 @@ public interface JdBracketHeightMapper {
 
     List<JdBracketHeight> findByBracketIdIn(@Param("bracketIdList") List<Integer> bracketIdList);
 
+    JdBracketHeight findByBracketId(@Param("bracketId")Integer bracketId);
+
+    Integer findNextbracketHeightId();
+
+    int updateHeightsByBracketId(@Param("updatedHeights")String updatedHeights,@Param("bracketId")Integer bracketId);
+
 
 }

@@ -42,4 +42,6 @@ public interface JdComponentService {
 	List<JdComponent> findByFirstCategoryId(Integer productId);
 
 	List<JdComponent> isExit(ComponentAddRequest request);
+
+	List<JdComponent> getAllShelf(Integer productId);
 }

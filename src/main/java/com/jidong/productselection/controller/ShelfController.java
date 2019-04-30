@@ -1,6 +1,7 @@
 package com.jidong.productselection.controller;
 
 import com.jidong.productselection.dto.ShelfHeight;
+import com.jidong.productselection.entity.JdBracketHeight;
 import com.jidong.productselection.entity.JdBracketMountingHeight;
 import com.jidong.productselection.entity.JdComponent;
 import com.jidong.productselection.entity.JdShelfConstraint;
@@ -8,10 +9,7 @@ import com.jidong.productselection.response.BaseResponse;
 import com.jidong.productselection.service.JdShelfService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -66,6 +64,26 @@ public class ShelfController {
 		} catch (Exception e){
 			log.error("获取安装方式错误！", e);
 			return BaseResponse.error("获取安装方式错误！");
+		}
+	}
+
+	@GetMapping("/getConstraint/{shelfId}")
+	public BaseResponse<List<ShelfHeight>> getConstraint(@PathVariable("shelfId") Integer shelfId){
+		try {
+			return BaseResponse.success(shelfService.getConstraint(shelfId));
+		} catch (Exception e){
+			log.error("获取架子约束错误!", e);
+			return BaseResponse.error("获取架子约束错误!");
+		}
+	}
+
+	@PostMapping("/save")
+	public BaseResponse<Integer> save(@RequestBody JdBracketHeight bracketHeight) {
+		try {
+			return BaseResponse.success(shelfService.insertOrUpdate(bracketHeight.getHeights(),bracketHeight.getBracketId()));
+		} catch (Exception e){
+			log.error("保存架子约束错误!", e);
+			return BaseResponse.error("保存架子约束错误!");
 		}
 	}
 }
