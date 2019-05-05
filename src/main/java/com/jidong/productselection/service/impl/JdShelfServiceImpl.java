@@ -72,7 +72,8 @@ public class JdShelfServiceImpl implements JdShelfService {
 
 	@Override
 	public List<ShelfHeight> getConstraint(Integer shelfId) {
-		return JSON.parseArray(bracketHeightMapper.findByBracketId(shelfId).getHeights(),ShelfHeight.class);
+		JdBracketHeight bracketHeight = bracketHeightMapper.findByBracketId(shelfId);
+		return bracketHeight != null ? JSON.parseArray(bracketHeight.getHeights(),ShelfHeight.class) : Collections.emptyList();
 	}
 
 	@Transactional
